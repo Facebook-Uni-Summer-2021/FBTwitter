@@ -1,6 +1,7 @@
 package com.codepath.apps.restclienttemplate.adapters;
 
 import android.content.Context;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,10 @@ import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder> {
     /*
@@ -92,13 +96,35 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         public void bind(Tweet tweet) {
             tvScreenName.setText(tweet.user.screenName);
             tvName.setText("@" + tweet.user.name);
-            tvTime.setText(tweet.createdAt);
+            tvTime.setText(getRelativeTimeAgo(tweet.createdAt));
             tvBody.setText(tweet.body);
 
             //Use Glide for images with URLs
             Glide.with(context)
                     .load(tweet.user.profileImageUrl)
                     .into(ivProfileImage);
+        }
+
+        //Implementation of the ParseRelativeData.java from the following
+            //https://gist.github.com/nesquena/f786232f5ef72f6e10a7
+        private String getRelativeTimeAgo (String time) {
+            String twitterFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
+            SimpleDateFormat sf =
+                    new SimpleDateFormat(twitterFormat, Locale.ENGLISH);
+            sf.setLenient(true);
+
+            String relativeDate = "";
+            try {
+                long dateMillis = sf.parse(time).getTime();
+                relativeDate =
+                        DateUtils.getRelativeTimeSpanString(dateMillis,
+                                System.currentTimeMillis(),
+                                DateUtils.FORMAT_ABBREV_RELATIVE).toString();
+            } catch (ParseException parseException) {
+                parseException.printStackTrace();
+            }
+
+            return relativeDate;
         }
     }
 }

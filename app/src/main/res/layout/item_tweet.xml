@@ -22,7 +22,9 @@
         android:layout_marginEnd="0dp"
         android:layout_marginBottom="0dp"
         android:layout_toEndOf="@+id/ivProfileImage"
+        android:includeFontPadding="false"
         android:textSize="16sp"
+        android:textStyle="bold"
         tools:text="SomeSuperCollGuyXx" />
 
     <TextView
@@ -43,23 +45,35 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="0dp"
         android:layout_marginEnd="0dp"
         android:layout_marginBottom="0dp"
         android:layout_toEndOf="@+id/tvScreenName"
-        android:textColor="#70000000"
-        android:textSize="12sp"
-        tools:text="@RealName" />
+        android:textColor="#8D000000"
+        android:textSize="14sp"
+        tools:text="atRealName" />
 
     <TextView
         android:id="@+id/tvTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="0dp"
+        android:layout_toEndOf="@+id/ivTimeSeparator"
+        android:textSize="14sp"
+        tools:text="5hr" />
+
+    <ImageView
+        android:id="@+id/ivTimeSeparator"
+        android:layout_width="5dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:layout_marginStart="3dp"
         android:layout_marginTop="0dp"
         android:layout_marginEnd="0dp"
         android:layout_marginBottom="0dp"
         android:layout_toEndOf="@+id/tvName"
-        android:textSize="16sp"
-        tools:text="5hr" />
+        app:srcCompat="@android:drawable/presence_invisible" />
 </RelativeLayout>
