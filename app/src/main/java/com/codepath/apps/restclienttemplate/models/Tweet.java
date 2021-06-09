@@ -49,7 +49,4 @@ public class Tweet {
 
         return tweets;
     }
-
-    //Manually update
-    public void manual () {}
 }
