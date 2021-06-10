@@ -50,6 +50,8 @@ public class TwitterClient extends OAuthBaseClient {
 	// DEFINE METHODS for different API endpoints here
 	// This is where we get information from an API (WE DONT PULL YET!!!
 	//  We just set it up for what we want timeline to contain)
+	//For rest APIs, performing individual GET, POST, PUT, etc
+	// should be done in this class
 	public void getHomeTimeline(JsonHttpResponseHandler handler) {
 		//The API URL used for getting some data list
 		//If URL doesnt exist, throws error that states as such
@@ -64,6 +66,20 @@ public class TwitterClient extends OAuthBaseClient {
 		params.put("since_id", 1);//Represents newest tweets; increase for newest
 		client.get(apiUrl, params, handler);
 	}
+
+
+	public void publishTweet (String tweetContent,
+							JsonHttpResponseHandler handler) {
+		//apiUrl represents endpoint in API
+		String apiUrl = getApiUrl("statuses/update.json");
+		RequestParams params = new RequestParams();
+		params.put("status", tweetContent);
+		//Previously, we got information from endpoint;
+		// this time we will post
+		//client.get(apiUrl, params, handler);
+		client.post(apiUrl, params, "", handler);
+	}
+
 
 	/* 1. Define the endpoint URL with getApiUrl and pass a relative path to the endpoint
 	 * 	  i.e getApiUrl("statuses/home_timeline.json");

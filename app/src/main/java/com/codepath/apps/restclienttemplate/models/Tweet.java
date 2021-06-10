@@ -3,16 +3,22 @@ package com.codepath.apps.restclienttemplate.models;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcel;
 
 import java.util.LinkedList;
 import java.util.List;
 
+//Required by Parceler
+@Parcel
 public class Tweet {
     private static final String TAG = "Tweet";
 
     public String body;
     public String createdAt;
     public User user;
+
+    //Required by Parceler
+    public Tweet () {}
 
     /**
      * Create a tweet as per the json fields/attributes (refer
