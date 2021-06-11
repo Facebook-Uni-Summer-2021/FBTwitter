@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -36,7 +37,9 @@ Delete = DELETE
 
 public class TimelineActivity extends AppCompatActivity {
     private static final String TAG = "TimelineActivity";
+
     private final int REQUEST_CODE = 20;
+    private SwipeRefreshLayout srlTweets;
 
     TwitterClient client;
     RecyclerView rvTweets;
@@ -48,6 +51,21 @@ public class TimelineActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
         Log.i(TAG, "onCreate");
+
+        //Initialize SwipeRefreshListener and set on listener
+        srlTweets = findViewById(R.id.srlTweets);
+        srlTweets.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                populateHomeTimeline();
+            }
+        });
+
+        //Set a lovely animation for the refresh
+        srlTweets.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
 
         //Create a client that contains tweets pulled
         // from method getRestClient()
@@ -128,8 +146,14 @@ public class TimelineActivity extends AppCompatActivity {
                 Log.i(TAG, "onPopulateTimelineSuccess: " + json.toString());
                 JSONArray results = json.jsonArray;
                 try {
+                    //Clear the adapter to ensure no errors occur
+                    adapter.clear();
                     tweets.addAll(Tweet.fromJsonArray(results));
+                    //Is this necessary, since we call for Notify?
+                    //adapter.addAll(tweets);
                     adapter.notifyDataSetChanged();
+                    //Signal refresh is complete if a refresh was brought here
+                    srlTweets.setRefreshing(false);
                 } catch (JSONException e) {
                     Log.e(TAG, "Json exception: " + results);
                 }
@@ -143,3 +167,13 @@ public class TimelineActivity extends AppCompatActivity {
         });
     }
 }
+
+/*
+Notes:
+The First/Second episode says to check declaration of intent link,
+    but this is to be done in the developer portal (I did not see this navigation
+    in the video, and had to search through dev settings in Twitter).
+The Pull To Refresh guide says to use an adapter.addAll() custom method,
+    yet we already implement a dataSetChanged method from adapter...is
+    important (they seem to do the same thing, unless it's better memory)?
+ */

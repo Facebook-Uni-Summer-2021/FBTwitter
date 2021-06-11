@@ -43,6 +43,9 @@ android {
     }
 }
 
+//SwipeRefreshLayout for scroll views
+apply plugin: 'com.android.application'
+
 dependencies {
     implementation fileTree(dir: 'libs', include: '*.jar')
     implementation 'com.codepath.libraries:android-oauth-handler:2.2.0'
@@ -65,4 +68,7 @@ dependencies {
     //Parceler
     implementation "org.parceler:parceler-api:1.1.12"
     annotationProcessor "org.parceler:parceler:1.1.12"
+
+    //SwipeRefreshLayout for scroll views
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
 }

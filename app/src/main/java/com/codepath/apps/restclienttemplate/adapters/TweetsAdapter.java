@@ -76,6 +76,20 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         return tweets.size();
     }
 
+    /*
+    Helper methods to clear or items from a list
+     */
+
+    public void clear() {
+        tweets.clear();
+        notifyDataSetChanged();
+    }
+
+    public void addAll (List<Tweet> tweets) {
+        this.tweets.addAll(tweets);
+        notifyDataSetChanged();
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder{
         TextView tvScreenName;
         TextView tvName;
