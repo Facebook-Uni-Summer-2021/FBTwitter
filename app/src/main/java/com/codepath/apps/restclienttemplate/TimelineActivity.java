@@ -155,14 +155,14 @@ public class TimelineActivity extends AppCompatActivity {
                     //Signal refresh is complete if a refresh was brought here
                     srlTweets.setRefreshing(false);
                 } catch (JSONException e) {
-                    Log.e(TAG, "Json exception: " + results);
+                    Log.e(TAG, "Json exception: " + e);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Headers headers,
                                   String response, Throwable throwable) {
-                Log.e(TAG, "onFailure: " + response, throwable);
+                Log.e(TAG, "onFailure: " , throwable);
             }
         });
     }
@@ -176,4 +176,6 @@ The First/Second episode says to check declaration of intent link,
 The Pull To Refresh guide says to use an adapter.addAll() custom method,
     yet we already implement a dataSetChanged method from adapter...is
     important (they seem to do the same thing, unless it's better memory)?
+Getting a full tweet requires the premium API version. Do we need to worry
+    about applying for this upgrade?
  */

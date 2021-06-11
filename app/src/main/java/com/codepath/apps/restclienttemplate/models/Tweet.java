@@ -16,6 +16,7 @@ public class Tweet {
     public String body;
     public String createdAt;
     public User user;
+    public Entity entity;
 
     //Required by Parceler
     public Tweet () {}
@@ -37,6 +38,10 @@ public class Tweet {
         // JSON (as we do in Tweet, we need to convert the object
         // from the JSON into a model)
         tweet.user = User.fromJson(jsonObject.getJSONObject("user"));
+
+        //Obtain the media from a tweet; entities are objects, what's in it
+        // are arrays
+        tweet.entity = Entity.fromJson(jsonObject.getJSONObject("entities"));
         return tweet;
     }
 
