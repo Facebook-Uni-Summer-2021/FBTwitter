@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.GlideException;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.models.Media;
 import com.codepath.apps.restclienttemplate.models.Tweet;
@@ -98,6 +99,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         TextView tvTime;
         TextView tvBody;
         ImageView ivProfileImage;
+        ImageView ivMedia;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -107,6 +109,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             tvTime = itemView.findViewById(R.id.tvTime);
             tvBody = itemView.findViewById(R.id.tvBody);
             ivProfileImage = itemView.findViewById(R.id.ivProfileImage);
+            ivMedia = itemView.findViewById(R.id.ivMedia);
         }
 
         public void bind(Tweet tweet) {
@@ -121,7 +124,38 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                     .into(ivProfileImage);
 
             List<Media> medias = tweet.entity.medias;
-            Log.i(TAG, tweet.user.screenName + "media: " + medias.get(0).displayUrl);
+            Media media = tweet.entity.medias.get(0);
+            Log.i(TAG, tweet.user.screenName + "media: " + medias.get(0).mediaUrl);
+            Log.i(TAG, "Avatar: " + tweet.user.profileImageUrl);
+//            if (tweet.entity.medias != null) {
+//                //Temporarily hard code size of media image, found in API
+//                // of media (should include as attribute)
+////                ivMedia.getLayoutParams().height = 150;
+////                ivMedia.getLayoutParams().width = 150;
+//                //ivMedia.setLayoutParams();
+//                if (medias.get(0).mediaUrl.substring(0, 3).compareTo("http") == 0) {
+//                    String secureUrl = "https" + medias.get(0).mediaUrl.substring(4, medias.get(0).mediaUrl.length() - 1);
+//                    Log.i(TAG, "Secured: " + secureUrl);
+//                }
+//                Glide.with(context).load(medias.get(0).mediaUrl).into(ivMedia);
+//            }
+
+            //This does not work and i do not know why
+            try {
+                ivMedia.getLayoutParams().height = 150;
+                ivMedia.getLayoutParams().width = 150;
+                Log.e(TAG, medias.get(0).mediaUrl.substring(0, 4));
+                String url = tweet.entity.medias.get(0).mediaUrl;
+                if (media.mediaUrl.substring(0, 4).compareTo("http") == 0) {
+                    url = "https" + media.mediaUrl.substring(4);
+                    Log.i(TAG, "Secured: " + url);
+                }
+                Glide.with(context).load(url).into(ivMedia);
+
+            } catch (NullPointerException e) {
+                Log.i(TAG, "No medias available");
+            }
+
         }
 
         //Implementation of the ParseRelativeData.java from the following

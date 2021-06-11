@@ -159,10 +159,11 @@ public class TimelineActivity extends AppCompatActivity {
                 }
             }
 
+            //It is IMPERATIVE to include String response to check for rate limit
             @Override
             public void onFailure(int statusCode, Headers headers,
                                   String response, Throwable throwable) {
-                Log.e(TAG, "onFailure: " , throwable);
+                Log.e(TAG, "onFailure: " + response , throwable);
             }
         });
     }
