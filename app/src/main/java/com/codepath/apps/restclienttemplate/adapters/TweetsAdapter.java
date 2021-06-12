@@ -127,6 +127,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             Media media = tweet.entity.medias.get(0);
             Log.i(TAG, tweet.user.screenName + "media: " + medias.get(0).mediaUrl);
             Log.i(TAG, "Avatar: " + tweet.user.profileImageUrl);
+            Log.i(TAG, "Tweet: " + tweet.body);
 //            if (tweet.entity.medias != null) {
 //                //Temporarily hard code size of media image, found in API
 //                // of media (should include as attribute)
@@ -141,22 +142,20 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 //            }
 
             //This does not work and i do not know why
-            try {
-                ivMedia.getLayoutParams().height = 150;
-                ivMedia.getLayoutParams().width = 150;
-                Log.e(TAG, medias.get(0).mediaUrl.substring(0, 4));
-                String url = tweet.entity.medias.get(0).mediaUrl;
-                if (media.mediaUrl.substring(0, 4).compareTo("http") == 0) {
-                    url = "https" + media.mediaUrl.substring(4);
-                    Log.i(TAG, "Secured: " + url);
-                }
-                Glide.with(context).load(url).into(ivMedia);
-
-            } catch (NullPointerException e) {
-                Log.i(TAG, "No medias available");
-            }
+            Glide.with(context).load(medias.get(0).mediaUrl).into(ivMedia);
+//            try {
+//                ivMedia.getLayoutParams().height = 150;
+//                ivMedia.getLayoutParams().width = 150;
+//                Log.e(TAG, medias.get(0).mediaUrl.substring(0, 4));
+//
+//
+//            } catch (NullPointerException e) {
+//                Log.i(TAG, "No medias available");
+//            }
 
         }
+
+        public void d (int[] arr) {}
 
         //Implementation of the ParseRelativeData.java from the following
             //https://gist.github.com/nesquena/f786232f5ef72f6e10a7

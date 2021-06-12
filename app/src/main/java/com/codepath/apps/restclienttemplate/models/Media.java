@@ -1,5 +1,7 @@
 package com.codepath.apps.restclienttemplate.models;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,14 +26,22 @@ public class Media {
             throws JSONException {
         Media media = new Media();
 
-        media.displayUrl =
-                jsonObject.getString("display_url");
-        media.expandedUrl =
-                jsonObject.getString("expanded_url");
-        media.mediaUrl =
-                jsonObject.getString("media_url");
+        media.displayUrl = secureString(jsonObject.getString("display_url"));
+        media.expandedUrl = secureString(jsonObject.getString("expanded_url"));
+        media.mediaUrl = secureString(jsonObject.getString("media_url"));
 
         return media;
+    }
+
+    private static String secureString (String str) {
+        if (str.substring(0, 4).compareTo("http") == 0 && str.substring(0, 5).compareTo("https") != 0) {
+            Log.i(TAG, "Previous: " + str);
+            str = "https" + str.substring(4);
+            Log.i(TAG, "Secured: " + str);
+        } else if (str.substring(0, 5).compareTo("https") == 0) {
+            //Do nothing
+        }
+        return str;
     }
 
     public static List<Media> fromJsonArray(JSONArray jsonArray) throws JSONException {

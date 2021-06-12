@@ -179,4 +179,7 @@ The Pull To Refresh guide says to use an adapter.addAll() custom method,
     important (they seem to do the same thing, unless it's better memory)?
 Getting a full tweet requires the premium API version. Do we need to worry
     about applying for this upgrade?
+Trying to use Glide while processing the image causes the RecView to misassign
+    the image to the wrong item; what exactly causes this? MAKE SURE TO DO
+    URL WORK BEFORE ASSIGNING URL TO GLIDE
  */
