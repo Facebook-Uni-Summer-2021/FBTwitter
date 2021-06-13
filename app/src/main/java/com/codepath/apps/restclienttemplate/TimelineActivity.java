@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.codepath.apps.restclienttemplate.adapters.TweetsAdapter;
@@ -47,12 +48,17 @@ public class TimelineActivity extends AppCompatActivity {
     RecyclerView rvTweets;
     TweetsAdapter adapter;
     List<Tweet> tweets;
+    ProgressBar pb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
         Log.i(TAG, "onCreate");
+
+        //Progress bar
+        pb = findViewById(R.id.pbTweetLoading);
+        pb.setVisibility(ProgressBar.INVISIBLE);
 
         //Initialize SwipeRefreshListener and set on listener
         srlTweets = findViewById(R.id.srlTweets);
@@ -87,10 +93,12 @@ public class TimelineActivity extends AppCompatActivity {
         scrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                Toast.makeText(TimelineActivity.this, "Loading tweets", Toast.LENGTH_SHORT).show();
                 int current = totalItemsCount - page;
                 Log.i(TAG, "onLoadMore: " + page + "at " + tweets.get(current).body);
                 Log.i(TAG, "onLoadMore: " + "id: " + tweets.get(current).tweetId);
-                client.getHomeTimeline(tweets.get(current).tweetId, new JsonHttpResponseHandler() {
+                long id = tweets.get(current).tweetId - 1;
+                client.getHomeTimeline(id, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Headers headers, JSON json) {
                         Log.i(TAG, "onPopulateTimelineSuccess loadMore: " + json.toString());
@@ -130,6 +138,7 @@ public class TimelineActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         //Inflate menu; adds items to menu if items are present
         //Requires id and menu
+        Log.e(TAG, "onCreateMenu");
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -178,6 +187,9 @@ public class TimelineActivity extends AppCompatActivity {
 
     private void populateHomeTimeline() {
         //Actually get the information we defined in TwitterApp
+        //Progress bar
+        pb.setVisibility(ProgressBar.VISIBLE);
+
         client.getHomeTimeline(new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
@@ -192,6 +204,9 @@ public class TimelineActivity extends AppCompatActivity {
                     adapter.notifyDataSetChanged();
                     //Signal refresh is complete if a refresh was brought here
                     srlTweets.setRefreshing(false);
+
+                    //Progress bar
+                    pb.setVisibility(ProgressBar.INVISIBLE);
                 } catch (JSONException e) {
                     Log.e(TAG, "Json exception: " + e);
                 }
@@ -202,6 +217,7 @@ public class TimelineActivity extends AppCompatActivity {
             public void onFailure(int statusCode, Headers headers,
                                   String response, Throwable throwable) {
                 Log.e(TAG, "onFailure: " + response , throwable);
+                Toast.makeText(TimelineActivity.this, "Rate limit reached! Please wait 15 minutes.", Toast.LENGTH_LONG).show();
             }
         });
     }

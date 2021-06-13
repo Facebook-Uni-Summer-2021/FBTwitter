@@ -7,6 +7,17 @@
     tools:context=".TimelineActivity">
 
     <!--
+    Including indeterminate loading
+    -->
+
+    <ProgressBar
+        android:id="@+id/pbTweetLoading"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"/>
+
+    <!--
     Wrap the RecyclerView in a SwipeRefreshLayout
     to allow updates to items in the RecView
     by dragging the view down.
