@@ -15,6 +15,7 @@ public class Tweet {
 
     public String body;
     public String createdAt;
+    public long tweetId;
     public User user;
     public Entity entity;
 
@@ -30,6 +31,7 @@ public class Tweet {
     public static Tweet fromJson(JSONObject jsonObject)
             throws JSONException {
         Tweet tweet = new Tweet();
+        tweet.tweetId = Long.parseLong(jsonObject.getString("id_str"));
         //The body, or text, of the tweet
         tweet.body = jsonObject.getString("text");
         //When the tweet was created

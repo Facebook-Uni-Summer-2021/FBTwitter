@@ -63,10 +63,20 @@ public class TwitterClient extends OAuthBaseClient {
 		RequestParams params = new RequestParams();
 		//For Twitter, count requires an int to specify amount to pull
 		params.put("count", "25");//Represents count of tweets to pull
-		params.put("since_id", 1);//Represents newest tweets; increase for newest
+		params.put("since_id", 1);//Represents newest tweets; increase for newer-newest
+		//params.put("max_id", 0);//Represents oldest tweets; opposite of since_id
 		client.get(apiUrl, params, handler);
 	}
 
+	//New getHomeTimeline to be called when we reach end of original getTimeline
+	public void getHomeTimeline (long maxId,
+								 JsonHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("statuses/home_timeline.json");
+		RequestParams params = new RequestParams();
+		params.put("count", "25");
+		params.put("max_id", maxId);
+		client.get(apiUrl, params, handler);
+	}
 
 	public void publishTweet (String tweetContent,
 							JsonHttpResponseHandler handler) {

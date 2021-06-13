@@ -12,6 +12,7 @@ import android.os.Parcel;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.codepath.apps.restclienttemplate.adapters.TweetsAdapter;
@@ -40,6 +41,7 @@ public class TimelineActivity extends AppCompatActivity {
 
     private final int REQUEST_CODE = 20;
     private SwipeRefreshLayout srlTweets;
+    private EndlessRecyclerViewScrollListener scrollListener;
 
     TwitterClient client;
     RecyclerView rvTweets;
@@ -75,9 +77,45 @@ public class TimelineActivity extends AppCompatActivity {
         rvTweets = findViewById(R.id.rvTweets);
         //Init list of tweets and adapter
         tweets = new ArrayList<>();
-        adapter = new TweetsAdapter(this, tweets);
+
         //Set layout manager and adapter
-        rvTweets.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new TweetsAdapter(this, tweets);
+        LinearLayoutManager layoutManager =
+                new LinearLayoutManager(this);
+        rvTweets.setLayoutManager(layoutManager);
+
+        scrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                int current = totalItemsCount - page;
+                Log.i(TAG, "onLoadMore: " + page + "at " + tweets.get(current).body);
+                Log.i(TAG, "onLoadMore: " + "id: " + tweets.get(current).tweetId);
+                client.getHomeTimeline(tweets.get(current).tweetId, new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Headers headers, JSON json) {
+                        Log.i(TAG, "onPopulateTimelineSuccess loadMore: " + json.toString());
+                        JSONArray results = json.jsonArray;
+                        try {
+                            //Clear the adapter to ensure no errors occur
+                            //adapter.clear();
+                            tweets.addAll(Tweet.fromJsonArray(results));
+                            //Is this necessary, since we call for Notify?
+                            //adapter.addAll(tweets);
+                            adapter.notifyDataSetChanged();
+                        } catch (JSONException e) {
+                            Log.e(TAG, "Json exception: " + e);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+
+                    }
+                });
+            }
+        };
+        rvTweets.addOnScrollListener(scrollListener);
+
         rvTweets.setAdapter(adapter);
 
         populateHomeTimeline();
