@@ -1,12 +1,14 @@
 package com.codepath.apps.restclienttemplate.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,9 +16,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.GlideException;
+import com.codepath.apps.restclienttemplate.DetailTweetActivity;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.models.Media;
 import com.codepath.apps.restclienttemplate.models.Tweet;
+
+import org.parceler.Parcels;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -101,6 +106,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         ImageView ivProfileImage;
         ImageView ivMedia;
 
+        RelativeLayout rlTweet;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -110,12 +117,13 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             tvBody = itemView.findViewById(R.id.tvBody);
             ivProfileImage = itemView.findViewById(R.id.ivProfileImage);
             ivMedia = itemView.findViewById(R.id.ivMedia);
+            rlTweet = itemView.findViewById(R.id.rlTweet);
         }
 
-        public void bind(Tweet tweet) {
+        public void bind(final Tweet tweet) {
             tvScreenName.setText(tweet.user.screenName);
             tvName.setText("@" + tweet.user.name);
-            tvTime.setText(getRelativeTimeAgo(tweet.createdAt));
+            tvTime.setText(Tweet.getRelativeTimeAgo(tweet.createdAt));
             tvBody.setText(tweet.body);
 
             //Use Glide for images with URLs
@@ -124,10 +132,10 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                     .into(ivProfileImage);
 
             List<Media> medias = tweet.entity.medias;
-            Media media = tweet.entity.medias.get(0);
-            Log.i(TAG, tweet.user.screenName + "media: " + medias.get(0).mediaUrl);
-            Log.i(TAG, "Avatar: " + tweet.user.profileImageUrl);
-            Log.i(TAG, "Tweet: " + tweet.body);
+//            Media media = tweet.entity.medias.get(0);
+//            Log.i(TAG, tweet.user.screenName + "media: " + medias.get(0).mediaUrl);
+//            Log.i(TAG, "Avatar: " + tweet.user.profileImageUrl);
+//            Log.i(TAG, "Tweet: " + tweet.body);
 //            if (tweet.entity.medias != null) {
 //                //Temporarily hard code size of media image, found in API
 //                // of media (should include as attribute)
@@ -153,30 +161,25 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 //                Log.i(TAG, "No medias available");
 //            }
 
-        }
+            ivProfileImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.i(TAG, "onClickAvatar");
+                    //Create detailed activity to view followers and following
+                }
+            });
 
-        public void d (int[] arr) {}
+            tvBody.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.i(TAG, "onClickTweet");
+                    //Create detailed tweet with like/dislike
+                    Intent intent = new Intent(context, DetailTweetActivity.class);
+                    intent.putExtra("tweet", Parcels.wrap(tweet));
+                    context.startActivity(intent);
+                }
+            });
 
-        //Implementation of the ParseRelativeData.java from the following
-            //https://gist.github.com/nesquena/f786232f5ef72f6e10a7
-        private String getRelativeTimeAgo (String time) {
-            String twitterFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
-            SimpleDateFormat sf =
-                    new SimpleDateFormat(twitterFormat, Locale.ENGLISH);
-            sf.setLenient(true);
-
-            String relativeDate = "";
-            try {
-                long dateMillis = sf.parse(time).getTime();
-                relativeDate =
-                        DateUtils.getRelativeTimeSpanString(dateMillis,
-                                System.currentTimeMillis(),
-                                DateUtils.FORMAT_ABBREV_RELATIVE).toString();
-            } catch (ParseException parseException) {
-                parseException.printStackTrace();
-            }
-
-            return relativeDate;
         }
     }
 }

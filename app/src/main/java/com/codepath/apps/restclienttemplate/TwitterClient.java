@@ -90,6 +90,28 @@ public class TwitterClient extends OAuthBaseClient {
 		client.post(apiUrl, params, "", handler);
 	}
 
+	public void likeTweet (long tweetId,
+						   JsonHttpResponseHandler handler) {
+		//REMEMBER: API URL is the link for RESTful actions
+		String apiUrl = getApiUrl("favorites/create.json");
+		RequestParams params = new RequestParams();
+		params.put("id", tweetId);
+		params.put("include_entities", true);//Maybe not needed
+		//"body" is required, but not explained
+		client.post(apiUrl, params, "", handler);
+	}
+
+	public void unlikeTweet (long tweetId,
+						   JsonHttpResponseHandler handler) {
+		//REMEMBER: API URL is the link for RESTful actions
+		String apiUrl = getApiUrl("favorites/destroy.json");
+		RequestParams params = new RequestParams();
+		params.put("id", tweetId);
+		params.put("include_entities", true);//Maybe not needed
+		//"body" is required, but not explained
+		client.post(apiUrl, params, "", handler);
+	}
+
 
 	/* 1. Define the endpoint URL with getApiUrl and pass a relative path to the endpoint
 	 * 	  i.e getApiUrl("statuses/home_timeline.json");

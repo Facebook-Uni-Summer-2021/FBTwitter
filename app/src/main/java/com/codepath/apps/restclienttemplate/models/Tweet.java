@@ -1,12 +1,17 @@
 package com.codepath.apps.restclienttemplate.models;
 
+import android.text.format.DateUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.parceler.Parcel;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 //Required by Parceler
 @Parcel
@@ -16,6 +21,10 @@ public class Tweet {
     public String body;
     public String createdAt;
     public long tweetId;
+    public long likeCount;
+    public long retweetCount;
+    public boolean isRetweeted;
+    public boolean isFavorited;
     public User user;
     public Entity entity;
 
@@ -36,6 +45,13 @@ public class Tweet {
         tweet.body = jsonObject.getString("text");
         //When the tweet was created
         tweet.createdAt = jsonObject.getString("created_at");
+        //These numbers are very much wrong, but i have no idea why as they are pulled
+        // the same way
+        tweet.likeCount = jsonObject.getLong("favorite_count");
+        tweet.retweetCount = jsonObject.getLong("retweet_count");
+        tweet.isFavorited = jsonObject.getBoolean("favorited");
+        tweet.isRetweeted = jsonObject.getBoolean("retweeted");
+
         //Create a user from the JSON Object stored in the API's
         // JSON (as we do in Tweet, we need to convert the object
         // from the JSON into a model)
@@ -61,5 +77,27 @@ public class Tweet {
         }
 
         return tweets;
+    }
+
+    //Implementation of the ParseRelativeData.java from the following
+    //https://gist.github.com/nesquena/f786232f5ef72f6e10a7
+    public static String getRelativeTimeAgo (String time) {
+        String twitterFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
+        SimpleDateFormat sf =
+                new SimpleDateFormat(twitterFormat, Locale.ENGLISH);
+        sf.setLenient(true);
+
+        String relativeDate = "";
+        try {
+            long dateMillis = sf.parse(time).getTime();
+            relativeDate =
+                    DateUtils.getRelativeTimeSpanString(dateMillis,
+                            System.currentTimeMillis(),
+                            DateUtils.FORMAT_ABBREV_RELATIVE).toString();
+        } catch (ParseException parseException) {
+            parseException.printStackTrace();
+        }
+
+        return relativeDate;
     }
 }

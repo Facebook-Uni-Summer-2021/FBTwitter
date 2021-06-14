@@ -50,11 +50,14 @@ public class TimelineActivity extends AppCompatActivity {
     List<Tweet> tweets;
     ProgressBar pb;
 
+    boolean isCreated = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
         Log.i(TAG, "onCreate");
+        isCreated = true;
 
         //Progress bar
         pb = findViewById(R.id.pbTweetLoading);
@@ -182,6 +185,8 @@ public class TimelineActivity extends AppCompatActivity {
             adapter.notifyItemInserted(0);
             //Scroll to top to view composed tweet
             rvTweets.smoothScrollToPosition(0);
+        } else if (requestCode == 55 && resultCode == RESULT_OK) {
+            Log.e(TAG, "onExitTweetDetail");
         }
     }
 
@@ -197,6 +202,7 @@ public class TimelineActivity extends AppCompatActivity {
                 JSONArray results = json.jsonArray;
                 try {
                     //Clear the adapter to ensure no errors occur
+                    tweets.clear();
                     adapter.clear();
                     tweets.addAll(Tweet.fromJsonArray(results));
                     //Is this necessary, since we call for Notify?
@@ -220,6 +226,19 @@ public class TimelineActivity extends AppCompatActivity {
                 Toast.makeText(TimelineActivity.this, "Rate limit reached! Please wait 15 minutes.", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    public void onActivityReenter(int resultCode, Intent data) {
+        super.onActivityReenter(resultCode, data);
+        Log.i(TAG, "ENTERING ACTIVITY");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i(TAG, "onResume");
+        populateHomeTimeline();
     }
 }
 
