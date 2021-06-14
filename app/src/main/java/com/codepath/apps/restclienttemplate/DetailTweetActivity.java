@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.codepath.apps.restclienttemplate.databinding.ActivityDetailTweetBinding;
 import com.codepath.apps.restclienttemplate.models.Media;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
@@ -28,16 +29,18 @@ public class DetailTweetActivity extends AppCompatActivity {
 
     TwitterClient client;
 
-    TextView tvScreenName;
-    TextView tvName;
-    TextView tvTime;
-    TextView tvBody;
-    TextView tvLikeCount;
-    TextView tvRetweetCount;
-    ImageView ivProfileImage;
-    ImageView ivMedia;
-    ImageView ivRetweet;
-    ImageView ivLike;
+    TextView tvScreenName;//
+    TextView tvName;//
+    TextView tvTime;//
+    TextView tvBody;//
+    TextView tvLikeCount;//
+    TextView tvRetweetCount;//
+    ImageView ivProfileImage;//
+    ImageView ivMedia;//
+    ImageView ivRetweet;//
+    ImageView ivLike;//
+    //tvTimeSepe
+    //ImageView ivTimeSeparator;
 
 
     //RelativeLayout rlTweet;
@@ -45,7 +48,10 @@ public class DetailTweetActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail_tweet);
+        ActivityDetailTweetBinding binding = ActivityDetailTweetBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
+        //setContentView(R.layout.activity_detail_tweet);
 
         final Tweet tweet = Parcels.unwrap(getIntent().getParcelableExtra("tweet"));
 
@@ -53,17 +59,17 @@ public class DetailTweetActivity extends AppCompatActivity {
 
         //Log.i(TAG, tweet.toString());
 
-        tvScreenName = findViewById(R.id.tvScreenName);
-        tvName = findViewById(R.id.tvName);
-        tvTime = findViewById(R.id.tvTime);
-        tvBody = findViewById(R.id.tvBody);
-        ivProfileImage = findViewById(R.id.ivProfileImage);
-        ivMedia = findViewById(R.id.ivMedia);
-        //rlTweet = findViewById(R.id.rlTweet);
-        ivRetweet = findViewById(R.id.ivRetweet);
-        ivLike = findViewById(R.id.ivLike);
-        tvLikeCount = findViewById(R.id.tvLikeCount);
-        tvRetweetCount = findViewById(R.id.tvRetweetCount);
+//        tvScreenName = findViewById(R.id.tvScreenName);
+//        tvName = findViewById(R.id.tvName);
+//        tvTime = findViewById(R.id.tvTime);
+//        tvBody = findViewById(R.id.tvBody);
+//        ivProfileImage = findViewById(R.id.ivProfileImage);
+//        ivMedia = findViewById(R.id.ivMedia);
+//        //rlTweet = findViewById(R.id.rlTweet);
+//        ivRetweet = findViewById(R.id.ivRetweet);
+//        ivLike = findViewById(R.id.ivLike);
+//        tvLikeCount = findViewById(R.id.tvLikeCount);
+//        tvRetweetCount = findViewById(R.id.tvRetweetCount);
 
         tvScreenName.setText(tweet.user.screenName);
         tvName.setText("@" + tweet.user.name);

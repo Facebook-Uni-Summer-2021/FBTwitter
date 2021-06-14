@@ -111,6 +111,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            //An activity does not exist for the adapter, or so it SEEMS
             tvScreenName = itemView.findViewById(R.id.tvScreenName);
             tvName = itemView.findViewById(R.id.tvName);
             tvTime = itemView.findViewById(R.id.tvTime);
@@ -149,7 +150,6 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 //                Glide.with(context).load(medias.get(0).mediaUrl).into(ivMedia);
 //            }
 
-            //This does not work and i do not know why
             Glide.with(context).load(medias.get(0).mediaUrl).into(ivMedia);
 //            try {
 //                ivMedia.getLayoutParams().height = 150;

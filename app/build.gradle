@@ -5,6 +5,7 @@ def apikeyProperties = new Properties()
 apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
 
 android {
+
     compileSdkVersion 28
 
     defaultConfig {
@@ -40,6 +41,11 @@ android {
         appCompatVersion = '1.0.0'
         designSupportVersion = '1.0.0'
         recyclerViewVersion = '1.0.0'
+    }
+
+    //What the heck is this
+    viewBinding {
+        enabled true
     }
 }
 

@@ -255,4 +255,5 @@ Getting a full tweet requires the premium API version. Do we need to worry
 Trying to use Glide while processing the image causes the RecView to misassign
     the image to the wrong item; what exactly causes this? MAKE SURE TO DO
     URL WORK BEFORE ASSIGNING URL TO GLIDE
+For viewbinding, MAKE SURE TO REBUILD WHEN CHANGES ARE MADE (see error)
  */
