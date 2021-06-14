@@ -94,6 +94,7 @@ public class DetailTweetActivity extends AppCompatActivity {
         List<Media> medias = tweet.entity.medias;
         Glide.with(this).load(medias.get(0).mediaUrl).into(ivMedia);
 
+        //Trying to like or retweet a retweeted tweet does not update the timeline
         ivLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,10 +131,38 @@ public class DetailTweetActivity extends AppCompatActivity {
             }
         });
 
+
+
         ivRetweet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i(TAG, "OnClick Retweet");
+                if (tweet.isRetweeted) {
+
+                    client.unretweet(tweet.tweetId, new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Headers headers, JSON json) {
+                            ivRetweet.setBackgroundColor(Color.parseColor("#FFFFFF"));
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                            Log.e(TAG, "onUnretweetFailure: " + response, throwable);
+                        }
+                    });
+                } else {
+                    client.retweet(tweet.tweetId, new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Headers headers, JSON json) {
+                            ivRetweet.setBackgroundColor(Color.parseColor("#ACEDAE"));
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                            Log.e(TAG, "onRetweetFailure: " + response, throwable);
+                        }
+                    });
+                }
             }
         });
     }
