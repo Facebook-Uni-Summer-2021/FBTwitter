@@ -32,7 +32,7 @@ public class ComposeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivityComposeBinding binding = ActivityComposeBinding.inflate(getLayoutInflater());
+        final ActivityComposeBinding binding = ActivityComposeBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
         //setContentView(R.layout.activity_compose);
@@ -43,12 +43,12 @@ public class ComposeActivity extends AppCompatActivity {
 //        btnTweet = findViewById(R.id.btnTweet);
 
         //On button press, compose tweet
-        btnTweet.setOnClickListener(new View.OnClickListener() {
+        binding.btnTweet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Do error handling, as tweet needs to be greater
                 // than 1 character and less than 280 characters
-                String tweetContent = etCompose.getText().toString();
+                String tweetContent = binding.etCompose.getText().toString();
                 if (tweetContent.isEmpty()) {
                     //If in anonymous class, ensure you do
                     // "[Class].this" instead of "this"

@@ -48,7 +48,7 @@ public class DetailTweetActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivityDetailTweetBinding binding = ActivityDetailTweetBinding.inflate(getLayoutInflater());
+        final ActivityDetailTweetBinding binding = ActivityDetailTweetBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
         //setContentView(R.layout.activity_detail_tweet);
@@ -71,37 +71,37 @@ public class DetailTweetActivity extends AppCompatActivity {
 //        tvLikeCount = findViewById(R.id.tvLikeCount);
 //        tvRetweetCount = findViewById(R.id.tvRetweetCount);
 
-        tvScreenName.setText(tweet.user.screenName);
-        tvName.setText("@" + tweet.user.name);
-        tvTime.setText(Tweet.getRelativeTimeAgo(tweet.createdAt));
-        tvBody.setText(tweet.body);
-        tvLikeCount.setText(String.valueOf(tweet.likeCount));
-        tvRetweetCount.setText(String.valueOf(tweet.retweetCount));
+        binding.tvScreenName.setText(tweet.user.screenName);
+        binding.tvName.setText("@" + tweet.user.name);
+        binding.tvTime.setText(Tweet.getRelativeTimeAgo(tweet.createdAt));
+        binding.tvBody.setText(tweet.body);
+        binding.tvLikeCount.setText(String.valueOf(tweet.likeCount));
+        binding.tvRetweetCount.setText(String.valueOf(tweet.retweetCount));
 
         //It seems tweets are not updated at any speed at all; I have no idea why it
         // is not correctly saving?
         if (tweet.isFavorited) {
-            ivLike.setImageDrawable(getDrawable(android.R.drawable.star_big_on));
+            binding.ivLike.setImageDrawable(getDrawable(android.R.drawable.star_big_on));
         } else {
-            ivLike.setImageDrawable(getDrawable(android.R.drawable.star_big_off));
+            binding.ivLike.setImageDrawable(getDrawable(android.R.drawable.star_big_off));
         }
 
         //I need a drawable to switch to
         if (tweet.isRetweeted) {
-            ivRetweet.setBackgroundColor(Color.parseColor("#ACEDAE"));
+            binding.ivRetweet.setBackgroundColor(Color.parseColor("#ACEDAE"));
         } else {
-            ivRetweet.setBackgroundColor(Color.parseColor("#FFFFFF"));
+            binding.ivRetweet.setBackgroundColor(Color.parseColor("#FFFFFF"));
         }
 
         //Use Glide for images with URLs
         Glide.with(this)
                 .load(tweet.user.profileImageUrl)
-                .into(ivProfileImage);
+                .into(binding.ivProfileImage);
         List<Media> medias = tweet.entity.medias;
-        Glide.with(this).load(medias.get(0).mediaUrl).into(ivMedia);
+        Glide.with(this).load(medias.get(0).mediaUrl).into(binding.ivMedia);
 
         //Trying to like or retweet a retweeted tweet does not update the timeline
-        ivLike.setOnClickListener(new View.OnClickListener() {
+        binding.ivLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i(TAG, "onClick Like");
@@ -111,7 +111,7 @@ public class DetailTweetActivity extends AppCompatActivity {
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
                             Log.i(TAG, "unlike tweet");
                             //Refresh tweets
-                            ivLike.setImageDrawable(getDrawable(android.R.drawable.star_big_off));
+                            binding.ivLike.setImageDrawable(getDrawable(android.R.drawable.star_big_off));
                         }
 
                         @Override
@@ -125,7 +125,7 @@ public class DetailTweetActivity extends AppCompatActivity {
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
                             Log.i(TAG, "like tweet");
                             //Refresh tweets
-                            ivLike.setImageDrawable(getDrawable(android.R.drawable.star_big_on));
+                            binding.ivLike.setImageDrawable(getDrawable(android.R.drawable.star_big_on));
                         }
 
                         @Override
@@ -139,7 +139,7 @@ public class DetailTweetActivity extends AppCompatActivity {
 
 
 
-        ivRetweet.setOnClickListener(new View.OnClickListener() {
+        binding.ivRetweet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i(TAG, "OnClick Retweet");
@@ -148,7 +148,7 @@ public class DetailTweetActivity extends AppCompatActivity {
                     client.unretweet(tweet.tweetId, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
-                            ivRetweet.setBackgroundColor(Color.parseColor("#FFFFFF"));
+                            binding.ivRetweet.setBackgroundColor(Color.parseColor("#FFFFFF"));
                         }
 
                         @Override
@@ -160,7 +160,7 @@ public class DetailTweetActivity extends AppCompatActivity {
                     client.retweet(tweet.tweetId, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
-                            ivRetweet.setBackgroundColor(Color.parseColor("#ACEDAE"));
+                            binding.ivRetweet.setBackgroundColor(Color.parseColor("#ACEDAE"));
                         }
 
                         @Override
