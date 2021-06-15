@@ -2,6 +2,7 @@ package com.codepath.apps.restclienttemplate;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -156,6 +157,7 @@ public class TimelineActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.mCompose) {
+            /*
             //Navigate to compose activity
             Intent intent = new Intent(TimelineActivity.this,
                     ComposeActivity.class);
@@ -167,6 +169,12 @@ public class TimelineActivity extends AppCompatActivity {
             startActivityForResult(intent, REQUEST_CODE);
             return true;
             //True means item was successful
+             */
+            FragmentManager fm = getSupportFragmentManager();
+            ComposeTweetFragment composeTweetFragment = ComposeTweetFragment.newInstance("Compose tweet", this);
+            composeTweetFragment.show(fm, "fragment_compose_tweet");
+
+
         }
 
         return super.onOptionsItemSelected(item);

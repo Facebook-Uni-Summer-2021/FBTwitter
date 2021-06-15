@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <!--tools:context=".ComposeActivity"-->
+
+    <!--
+    A wrapper for EditText for EditText designs; requires the
+    following changes:
+        https://guides.codepath.com/android/Design-Support-Library
+    Make sure that if any other widgets rely on the positioning
+    of these layout containers, give the container an ID and swap
+    the original widget ID with the layout ID
+    -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/etComposeModalLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:counterEnabled="true"
+        app:counterMaxLength="280">
+
+        <EditText
+            android:id="@+id/etComposeModal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="0dp"
+            android:ems="10"
+            android:gravity="start|top"
+            android:hint="@string/etComposeHint"
+            android:inputType="textMultiLine"
+            android:minLines="5" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <Button
+        android:id="@+id/btnModalTweet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/etComposeModalLayout"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="0dp"
+        android:text="@string/btnTweetText" />
+</RelativeLayout>
