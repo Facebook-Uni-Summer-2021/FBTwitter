@@ -23,9 +23,11 @@ import org.parceler.Parcels;
 
 import okhttp3.Headers;
 
-public class ComposeTweetFragment extends DialogFragment implements OnComposeActionListener {
+public class ComposeTweetFragment extends DialogFragment {
     private static final String TAG = "ComposeTweetFragment";
     private static final int MAX_TWEET_LENGTH = 280;
+    private ComposeListener listener;
+
     TwitterClient client;
     static Context context;
     Tweet tweet;
@@ -33,17 +35,22 @@ public class ComposeTweetFragment extends DialogFragment implements OnComposeAct
     private EditText etComposeModal;
     private Button btnModalTweet;
 
-    //Interface for transferring data to activity
-    public interface ComposeTweetActionListener {
-        void onFinishedCompose(Tweet tweet);
+    //Create interface in Fragment
+    public interface ComposeListener {
+        //???
+        public void onDialogReady (String title);
+        //Load data
+        public void onTweetLoaded (Tweet tweet);
     }
 
-    @Override
-    public boolean onComposeAction() {
-        ComposeTweetActionListener listener = (ComposeTweetActionListener) getActivity();
-        //listener.onFinishedCompose();
-        return true;
+    public void setComposeListener (ComposeListener listener) {
+        this.listener = listener;
     }
+
+//    //Required by interface?
+//    public ComposeTweetFragment () {
+//        this.listener = null;
+//    }
 
     //Required for DialogFragment
     public ComposeTweetFragment () {
@@ -128,7 +135,10 @@ public class ComposeTweetFragment extends DialogFragment implements OnComposeAct
                                         context.setResult(RESULT_OK, intent);
                                         finish();
                                          */
-
+                                        if (listener != null) {
+                                            listener.onTweetLoaded(tweet);
+                                        }
+                                        dismiss();
 
                                     } catch (JSONException e) {
                                         Log.e(TAG, "onFailure: ", e);

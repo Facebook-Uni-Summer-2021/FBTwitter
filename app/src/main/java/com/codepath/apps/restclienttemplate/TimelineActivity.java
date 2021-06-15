@@ -174,6 +174,27 @@ public class TimelineActivity extends AppCompatActivity {
             ComposeTweetFragment composeTweetFragment = ComposeTweetFragment.newInstance("Compose tweet", this);
             composeTweetFragment.show(fm, "fragment_compose_tweet");
 
+            composeTweetFragment.setComposeListener(new ComposeTweetFragment.ComposeListener() {
+                @Override
+                public void onDialogReady(String title) {
+                    Log.i(TAG, "Title: " + title);
+                }
+
+                @Override
+                public void onTweetLoaded(Tweet tweet) {
+                    Log.i(TAG, "Load tweet into recycler");
+//                    //Get data from intent, in this case the tweet object
+//                    Tweet tweet =
+//                            Parcels.unwrap(data.getParcelableExtra("tweet"));
+                    //Update RecView with new tweet
+                    tweets.add(0, tweet);
+                    //Updated adapter
+                    adapter.notifyItemInserted(0);
+                    //Scroll to top to view composed tweet
+                    rvTweets.smoothScrollToPosition(0);
+                }
+            });
+
 
         }
 
