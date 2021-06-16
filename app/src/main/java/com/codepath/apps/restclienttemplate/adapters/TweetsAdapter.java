@@ -1,5 +1,6 @@
 package com.codepath.apps.restclienttemplate.adapters;
 
+import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
 import android.text.format.DateUtils;
@@ -150,6 +151,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             tvName.setText(tweet.user.name);
             tvTime.setText(Tweet.getRelativeTimeAgo(tweet.createdAt));
             tvBody.setText(tweet.body);
+
             tvTweetLikeCount.setText(String.valueOf(tweet.likeCount));
             tvTweetRetweetCount.setText(String.valueOf(tweet.retweetCount));
 
@@ -202,7 +204,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                     //Create detailed tweet with like/dislike
                     Intent intent = new Intent(context, DetailTweetActivity.class);
                     intent.putExtra("tweet", Parcels.wrap(tweet));
-                    context.startActivity(intent);
+                    ((TimelineActivity)context).startActivityForResult(intent, 55);
                 }
             });
 
@@ -237,30 +239,14 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                 @Override
                 public void onClick(View v) {
                     if (tweet.isRetweeted) {
-                        client.unlikeTweet(tweet.tweetId, new JsonHttpResponseHandler() {
-                            @Override
-                            public void onSuccess(int statusCode, Headers headers, JSON json) {
-                                ivTweetRetweet.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_retweet_stroke));
-                            }
+                        tweet.unRetweet(client);
+                        ivTweetRetweet.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_retweet_stroke));
 
-                            @Override
-                            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                                Log.e(TAG, "Error unreweeting: " + response, throwable);
-                            }
-                        });
                     } else {
-                        client.retweet(tweet.tweetId, new JsonHttpResponseHandler() {
-                            @Override
-                            public void onSuccess(int statusCode, Headers headers, JSON json) {
-                                ivTweetRetweet.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_retweet));
-                            }
-
-                            @Override
-                            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                                Log.e(TAG, "Error reweeting: " + response, throwable);
-                            }
-                        });
+                        tweet.retweet(client);
+                        ivTweetRetweet.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_retweet));
                     }
+                    tvTweetRetweetCount.setText(String.valueOf(tweet.retweetCount));
                 }
             });
 

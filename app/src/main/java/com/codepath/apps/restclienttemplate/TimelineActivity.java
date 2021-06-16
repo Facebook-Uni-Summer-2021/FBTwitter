@@ -57,6 +57,7 @@ public class TimelineActivity extends AppCompatActivity {
 
     boolean isCreated = false;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -233,6 +234,17 @@ public class TimelineActivity extends AppCompatActivity {
             rvTweets.smoothScrollToPosition(0);
         } else if (requestCode == 55 && resultCode == RESULT_OK) {
             Log.e(TAG, "onExitTweetDetail");
+            // update the tweets array
+            Tweet modifiedTweet =
+                    Parcels.unwrap(data.getParcelableExtra("modifiedTweet"));
+            for (int i = 0; i < tweets.size(); i++) {
+                if(tweets.get(i).tweetId == modifiedTweet.tweetId) {
+                    tweets.remove(i);
+                    tweets.add(i, modifiedTweet);
+                    adapter.notifyItemChanged(i);
+                    break;
+                }
+            }
         }
     }
 
@@ -284,7 +296,6 @@ public class TimelineActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.i(TAG, "onResume");
-        populateHomeTimeline();
     }
 }
 

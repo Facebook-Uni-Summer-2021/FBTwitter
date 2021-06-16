@@ -48,17 +48,25 @@ public class Tweet {
     public static Tweet fromJson(JSONObject jsonObject)
             throws JSONException {
         Tweet tweet = new Tweet();
-        tweet.tweetId = Long.parseLong(jsonObject.getString("id_str"));
+        // jsonObject.getJSONObject("retweeted_status").getString("id_str");
+        if(jsonObject.has("retweeted_status")) {
+            JSONObject retweetedStatus = jsonObject.getJSONObject("retweeted_status");
+            tweet.tweetId = retweetedStatus.getLong("id");
+            tweet.likeCount = retweetedStatus.getLong("favorite_count");
+            tweet.isFavorited = retweetedStatus.getBoolean("favorited");
+        } else {
+            tweet.tweetId = jsonObject.getLong("id");
+            tweet.likeCount = jsonObject.getLong("favorite_count");
+            tweet.isFavorited = jsonObject.getBoolean("favorited");
+        }
+
+        tweet.retweetCount = jsonObject.getLong("retweet_count");
+        tweet.isRetweeted = jsonObject.getBoolean("retweeted");
+
         //The body, or text, of the tweet
         tweet.body = jsonObject.getString("text");
         //When the tweet was created
         tweet.createdAt = jsonObject.getString("created_at");
-        //These numbers are very much wrong, but i have no idea why as they are pulled
-        // the same way
-        tweet.likeCount = jsonObject.getLong("favorite_count");
-        tweet.retweetCount = jsonObject.getLong("retweet_count");
-        tweet.isFavorited = jsonObject.getBoolean("favorited");
-        tweet.isRetweeted = jsonObject.getBoolean("retweeted");
 
         //Create a user from the JSON Object stored in the API's
         // JSON (as we do in Tweet, we need to convert the object
@@ -113,12 +121,12 @@ public class Tweet {
         if (likeCount > 0) {
             likeCount--;
         }
-
+        isFavorited = false;
         client.unlikeTweet(tweetId, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
                 Log.i(TAG, "unlike tweet");
-                isFavorited = false;
+
             }
 
             @Override
@@ -130,17 +138,52 @@ public class Tweet {
 
     public void like(TwitterClient client) {
         likeCount++;
-
+        isFavorited = true;
         client.likeTweet(tweetId, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
                 Log.i(TAG, "like tweet");
-                isFavorited = true;
+
             }
 
             @Override
             public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
                 Log.e(TAG, "onLikeFailure: " + response, throwable);
+            }
+        });
+    }
+
+    public void unRetweet(TwitterClient client) {
+        if (retweetCount > 0) {
+            retweetCount--;
+        }
+        isRetweeted = false;
+        client.unretweet(tweetId, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                Log.i(TAG, "unretweet tweet");
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                Log.e(TAG, "onUnretweetFailure: " + response, throwable);
+            }
+        });
+    }
+
+    public void retweet(TwitterClient client) {
+        retweetCount++;
+        isRetweeted = true;
+
+        client.retweet(tweetId, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                Log.i(TAG, "retweet tweet");
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                Log.e(TAG, "onRetweetFailure: " + response, throwable);
             }
         });
     }

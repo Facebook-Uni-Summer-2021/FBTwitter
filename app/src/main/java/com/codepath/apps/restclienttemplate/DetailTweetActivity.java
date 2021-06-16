@@ -26,7 +26,6 @@ import okhttp3.Headers;
 
 public class DetailTweetActivity extends AppCompatActivity {
     private static final String TAG = "DetailActivityTweet";
-    public static final int RESULT_CODE = 55;
 
     TwitterClient client;
 
@@ -40,6 +39,7 @@ public class DetailTweetActivity extends AppCompatActivity {
     ImageView ivMedia;//
     ImageView ivRetweet;//
     ImageView ivLike;//
+    Tweet tweet;
     //tvTimeSepe
     //ImageView ivTimeSeparator;
 
@@ -54,7 +54,7 @@ public class DetailTweetActivity extends AppCompatActivity {
         setContentView(view);
         //setContentView(R.layout.activity_detail_tweet);
 
-        final Tweet tweet = Parcels.unwrap(getIntent().getParcelableExtra("tweet"));
+        tweet = Parcels.unwrap(getIntent().getParcelableExtra("tweet"));
 
         client = TwitterApp.getRestClient(this);
 
@@ -119,41 +119,22 @@ public class DetailTweetActivity extends AppCompatActivity {
                     tweet.like(client);
                     binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart));
                 }
+                binding.tvLikeCount.setText(String.valueOf(tweet.likeCount));
             }
         });
-
-
 
         binding.ivRetweet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i(TAG, "OnClick Retweet");
                 if (tweet.isRetweeted) {
-
-                    client.unretweet(tweet.tweetId, new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Headers headers, JSON json) {
-                            binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet_stroke));
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                            Log.e(TAG, "onUnretweetFailure: " + response, throwable);
-                        }
-                    });
+                    tweet.unRetweet(client);
+                    binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet_stroke));
                 } else {
-                    client.retweet(tweet.tweetId, new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Headers headers, JSON json) {
-                            binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet));
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                            Log.e(TAG, "onRetweetFailure: " + response, throwable);
-                        }
-                    });
+                    tweet.retweet(client);
+                    binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet));
                 }
+                binding.tvRetweetCount.setText(String.valueOf(tweet.retweetCount));
             }
         });
 
@@ -215,12 +196,12 @@ public class DetailTweetActivity extends AppCompatActivity {
 //        Log.i(TAG, "onPause");
 //    }
 
+
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.i(TAG, "onDestroy");
-        //Intent intent = new Intent();
-        setResult(RESULT_CODE);
-        finish();
+    public void finish() {
+        Intent i  = getIntent();
+        i.putExtra("modifiedTweet", Parcels.wrap(tweet));
+        setResult(RESULT_OK, i);
+        super.finish();
     }
 }
