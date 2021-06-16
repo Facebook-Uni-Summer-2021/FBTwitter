@@ -19,6 +19,11 @@ import org.parceler.Parcels;
 
 import okhttp3.Headers;
 
+/**
+ * This class is not longer used and may be outdated
+ * if included; represents the original compose tweet
+ * activity.
+ */
 public class ComposeActivity extends AppCompatActivity {
     private static final String TAG = "ComposeActivity";
 
@@ -29,6 +34,11 @@ public class ComposeActivity extends AppCompatActivity {
 
     TwitterClient client;
 
+    /**
+     * An activity for composing a tweet and publishing
+     * it to Twitter.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

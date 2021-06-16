@@ -54,6 +54,11 @@ public class TwitterClient extends OAuthBaseClient {
 	//  We just set it up for what we want timeline to contain)
 	//For rest APIs, performing individual GET, POST, PUT, etc
 	// should be done in this class
+
+	/**
+	 * A client method to obtain the home timeline from the Twitter API.
+	 * @param handler Handler for internet usage.
+	 */
 	public void getHomeTimeline(JsonHttpResponseHandler handler) {
 		//The API URL used for getting some data list
 		//If URL doesnt exist, throws error that states as such
@@ -71,6 +76,12 @@ public class TwitterClient extends OAuthBaseClient {
 	}
 
 	//New getHomeTimeline to be called when we reach end of original getTimeline
+
+	/**
+	 * A client method to obtain additional tweets in onLoadMore in TimelineActivity.
+	 * @param maxId The ID of a tweet, where all tweet IDs less (aka older tweets) will be pulled.
+	 * @param handler
+	 */
 	public void getHomeTimeline (long maxId,
 								 JsonHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/home_timeline.json");
@@ -80,6 +91,11 @@ public class TwitterClient extends OAuthBaseClient {
 		client.get(apiUrl, params, handler);
 	}
 
+	/**
+	 * A client method to publish a tweet.
+	 * @param tweetContent New tweet body.
+	 * @param handler
+	 */
 	public void publishTweet (String tweetContent,
 							JsonHttpResponseHandler handler) {
 		//apiUrl represents endpoint in API
@@ -92,6 +108,12 @@ public class TwitterClient extends OAuthBaseClient {
 		client.post(apiUrl, params, "", handler);
 	}
 
+	/**
+	 * A client method to publish a tweet reply.
+	 * @param tweetContent New tweet body.
+	 * @param tweetId Tweet being replied to.
+	 * @param handler
+	 */
 	public void replyTweet (String tweetContent, long tweetId, JsonHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/update.json");
 		RequestParams params = new RequestParams();
@@ -101,6 +123,11 @@ public class TwitterClient extends OAuthBaseClient {
 		client.post(apiUrl, params, "", handler);
 	}
 
+	/**
+	 * A client method to like a tweet.
+	 * @param tweetId The tweet to like.
+	 * @param handler
+	 */
 	public void likeTweet (long tweetId,
 						   JsonHttpResponseHandler handler) {
 		//REMEMBER: API URL is the link for RESTful actions
@@ -112,6 +139,11 @@ public class TwitterClient extends OAuthBaseClient {
 		client.post(apiUrl, params, "", handler);
 	}
 
+	/**
+	 * A client method to unlike a tweet.
+	 * @param tweetId The tweet to unlike.
+	 * @param handler
+	 */
 	public void unlikeTweet (long tweetId,
 							 final JsonHttpResponseHandler handler) {
 		//REMEMBER: API URL is the link for RESTful actions
@@ -123,6 +155,11 @@ public class TwitterClient extends OAuthBaseClient {
 		client.post(apiUrl, params, "", handler);
 	}
 
+	/**
+	 * A client method to retweet a tweet.
+	 * @param tweetId The tweet to retweet.
+	 * @param handler
+	 */
 	public void retweet (long tweetId,
 							 JsonHttpResponseHandler handler) {
 		//REMEMBER: API URL is the link for RESTful actions
@@ -133,6 +170,11 @@ public class TwitterClient extends OAuthBaseClient {
 		client.post(apiUrl, params, "", handler);
 	}
 
+	/**
+	 * A client method to unretweet a tweet.
+	 * @param tweetId The tweet to unretweet.
+	 * @param handler
+	 */
 	public void unretweet (long tweetId,
 							 JsonHttpResponseHandler handler) {
 		//REMEMBER: API URL is the link for RESTful actions
@@ -143,6 +185,11 @@ public class TwitterClient extends OAuthBaseClient {
 		client.post(apiUrl, params, "", handler);
 	}
 
+	/**
+	 * A client method to obtain the users a user is following (aka their friends).
+	 * @param userId The ID of a user.
+	 * @param handler
+	 */
 	public void getFriends (long userId, JsonHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("friends/list.json");
 		RequestParams params = new RequestParams();
@@ -151,6 +198,11 @@ public class TwitterClient extends OAuthBaseClient {
 		client.get(apiUrl, params, handler);
 	}
 
+	/**
+	 * A client method to obtain the users following a user.
+	 * @param userId The ID of a user.
+	 * @param handler
+	 */
 	public void getFollowers (long userId, JsonHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("followers/list.json");
 		RequestParams params = new RequestParams();

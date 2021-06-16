@@ -15,7 +15,6 @@ import java.util.List;
  * Potentially could be an object that stores all of the entities
  * in the Twitter API; original purpose to store media from a tweet
  */
-
 @Parcel
 public class Entity {
     private static final String TAG = "Entity";

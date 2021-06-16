@@ -41,6 +41,9 @@ Update = PUT
 Delete = DELETE
  */
 
+/**
+ * The full user timeline.
+ */
 public class TimelineActivity extends AppCompatActivity {
     private static final String TAG = "TimelineActivity";
 
@@ -62,9 +65,11 @@ public class TimelineActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
+        //Custom toolbar for lovely design animations (see AndroidManifest)
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setBackgroundColor(Color.parseColor("#07CCD9"));
         setSupportActionBar(toolbar);
+
         fm = getSupportFragmentManager();
         Log.i(TAG, "onCreate");
         isCreated = true;
@@ -103,6 +108,7 @@ public class TimelineActivity extends AppCompatActivity {
                 new LinearLayoutManager(this);
         rvTweets.setLayoutManager(layoutManager);
 
+        //Handle loading additional tweets
         scrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
@@ -117,8 +123,7 @@ public class TimelineActivity extends AppCompatActivity {
                         Log.i(TAG, "onPopulateTimelineSuccess loadMore: " + json.toString());
                         JSONArray results = json.jsonArray;
                         try {
-                            //Clear the adapter to ensure no errors occur
-                            //adapter.clear();
+                            //Append current tweet list with older tweets
                             tweets.addAll(Tweet.fromJsonArray(results));
                             //Is this necessary, since we call for Notify?
                             //adapter.addAll(tweets);
@@ -130,15 +135,13 @@ public class TimelineActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-
+                        Log.e(TAG, "onFailure: " + response, throwable);
                     }
                 });
             }
         };
         rvTweets.addOnScrollListener(scrollListener);
-
         rvTweets.setAdapter(adapter);
-
         populateHomeTimeline();
     }
 
@@ -207,7 +210,7 @@ public class TimelineActivity extends AppCompatActivity {
 
 
         } else if (item.getItemId() == R.id.mSignOut) {
-
+            //Logout!!! CHECK THIS OUT!
             client.clearAccessToken();
             // go back to the login activity
             Intent i = new Intent(this, LoginActivity.class);
@@ -223,6 +226,8 @@ public class TimelineActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
+            //Handled original ComposeActivity, which is no longer included
+
             //Get data from intent, in this case the tweet object
             Tweet tweet =
                     Parcels.unwrap(data.getParcelableExtra("tweet"));
@@ -233,11 +238,16 @@ public class TimelineActivity extends AppCompatActivity {
             //Scroll to top to view composed tweet
             rvTweets.smoothScrollToPosition(0);
         } else if (requestCode == 55 && resultCode == RESULT_OK) {
+            //Handles any updates made to tweets by DetailTweetActivity to ensure
+            // RecyclerView is updated appropriately.
+
             Log.e(TAG, "onExitTweetDetail");
             // update the tweets array
             Tweet modifiedTweet =
                     Parcels.unwrap(data.getParcelableExtra("modifiedTweet"));
             for (int i = 0; i < tweets.size(); i++) {
+                //Find the old tweet (before update) and replace it
+                // with new tweet (unwrapped from DetailTweetActivity)
                 if(tweets.get(i).tweetId == modifiedTweet.tweetId) {
                     tweets.remove(i);
                     tweets.add(i, modifiedTweet);

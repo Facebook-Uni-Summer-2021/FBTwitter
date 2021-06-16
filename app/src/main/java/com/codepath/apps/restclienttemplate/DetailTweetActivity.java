@@ -24,11 +24,15 @@ import java.util.List;
 
 import okhttp3.Headers;
 
+/**
+ * Displays a detailed view of a tweet from the timeline
+ */
 public class DetailTweetActivity extends AppCompatActivity {
     private static final String TAG = "DetailActivityTweet";
 
     TwitterClient client;
 
+    //Widgets not in use in favor of ViewBinding
     TextView tvScreenName;//
     TextView tvName;//
     TextView tvTime;//
@@ -54,6 +58,7 @@ public class DetailTweetActivity extends AppCompatActivity {
         setContentView(view);
         //setContentView(R.layout.activity_detail_tweet);
 
+        //Get tweet from previous activity
         tweet = Parcels.unwrap(getIntent().getParcelableExtra("tweet"));
 
         client = TwitterApp.getRestClient(this);
@@ -72,10 +77,10 @@ public class DetailTweetActivity extends AppCompatActivity {
 //        tvLikeCount = findViewById(R.id.tvLikeCount);
 //        tvRetweetCount = findViewById(R.id.tvRetweetCount);
 
-        Log.e(TAG, "Current tweet: " + tweet.tweetId);
-        Log.e(TAG, "Current tweet like status: " + tweet.isFavorited);
-        Log.e(TAG, "Name: " + tweet.user.name);
-        Log.e(TAG, "ScrenName: " + tweet.user.screenName);
+        Log.i(TAG, "Current tweet: " + tweet.tweetId);
+        Log.i(TAG, "Current tweet like status: " + tweet.isFavorited);
+        Log.i(TAG, "Name: " + tweet.user.name);
+        Log.i(TAG, "ScrenName: " + tweet.user.screenName);
 
         binding.tvScreenName.setText(tweet.user.screenName);
         binding.tvName.setText("@" + tweet.user.name);
@@ -84,15 +89,13 @@ public class DetailTweetActivity extends AppCompatActivity {
         binding.tvLikeCount.setText(String.valueOf(tweet.likeCount));
         binding.tvRetweetCount.setText(String.valueOf(tweet.retweetCount));
 
-        //It seems tweets are not updated at any speed at all; I have no idea why it
-        // is not correctly saving?
+        //Defines like and retweet image based on if it has been liked or retweeted
         if (tweet.isFavorited) {
             binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart));
         } else {
             binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart_stroke));
         }
 
-        //I need a drawable to switch to
         if (tweet.isRetweeted) {
             binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet));
         } else {
@@ -106,23 +109,28 @@ public class DetailTweetActivity extends AppCompatActivity {
         List<Media> medias = tweet.entity.medias;
         Glide.with(this).load(medias.get(0).mediaUrl).into(binding.ivMedia);
 
-        //Trying to like or retweet a retweeted tweet does not update the timeline
+        //To deal with possible disconnect and to make it nicer, manually
+        // change the values of the likeCount and ivLike to accurately display changes
+        // to user before API update
         binding.ivLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i(TAG, "onClick Like");
 
                 if (tweet.isFavorited) {
+                    //All work placed in Tweet model so work stays consistent
                     tweet.unlike(client);
                     binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart_stroke));
                 } else {
                     tweet.like(client);
                     binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart));
                 }
+                //Make sure to set count!!!!!
                 binding.tvLikeCount.setText(String.valueOf(tweet.likeCount));
             }
         });
 
+        //Same as ivLike handler
         binding.ivRetweet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -138,6 +146,7 @@ public class DetailTweetActivity extends AppCompatActivity {
             }
         });
 
+        //Create UserDetailActivity to view user information
         binding.ivProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -151,6 +160,7 @@ public class DetailTweetActivity extends AppCompatActivity {
             }
         });
 
+        //Reply to a tweet (requires update in TimelineActivity WITHOUT sending back up)
         binding.ivReply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -161,19 +171,6 @@ public class DetailTweetActivity extends AppCompatActivity {
                 ComposeTweetFragment composeTweetFragment = ComposeTweetFragment.newInstance("DetailReply", DetailTweetActivity.this, tweet);
                 composeTweetFragment.show(fm, "fragment_compose_tweet");
 
-//                //Compose message
-//                String temp = "@" + tweet.user.screenName + " " + "Temp tweet content here!";
-//                client.replyTweet(temp, tweet.tweetId, new JsonHttpResponseHandler() {
-//                    @Override
-//                    public void onSuccess(int statusCode, Headers headers, JSON json) {
-//                        Log.i(TAG, "made a reply");
-//                    }
-//
-//                    @Override
-//                    public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-//                        Log.i(TAG, "Reply failed: " + response, throwable);
-//                    }
-//                });
             }
         });
     }
@@ -196,7 +193,8 @@ public class DetailTweetActivity extends AppCompatActivity {
 //        Log.i(TAG, "onPause");
 //    }
 
-
+    //To appropriately update the TimelineActivity, on completion
+    // of this activity send back the changed tweet (liked, unliked, retweeted, unretweeted)
     @Override
     public void finish() {
         Intent i  = getIntent();

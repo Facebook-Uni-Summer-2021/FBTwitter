@@ -21,6 +21,9 @@ import java.util.Locale;
 
 import okhttp3.Headers;
 
+/**
+ * Represents a tweet!!!!!!!!!!!!!!!!!
+ */
 //Required by Parceler
 @Parcel
 public class Tweet {
@@ -49,6 +52,10 @@ public class Tweet {
             throws JSONException {
         Tweet tweet = new Tweet();
         // jsonObject.getJSONObject("retweeted_status").getString("id_str");
+        //To handle an error where the timeline would not update correctly for retweeted
+        // tweets because the IDs were different, we checked if a tweet was retweeted;
+        // if the tweet was, we got the original tweet's information to accurately
+        // like/unlike and retweet/unretweet it
         if(jsonObject.has("retweeted_status")) {
             JSONObject retweetedStatus = jsonObject.getJSONObject("retweeted_status");
             tweet.tweetId = retweetedStatus.getLong("id");
@@ -117,7 +124,12 @@ public class Tweet {
         return relativeDate;
     }
 
+    /**
+     * Updates the like status of a tweet both locally and in the API.
+     * @param client The TwitterClient.
+     */
     public void unlike(TwitterClient client) {
+        //This is done so the timeline is accurately depicted
         if (likeCount > 0) {
             likeCount--;
         }
@@ -136,6 +148,10 @@ public class Tweet {
         });
     }
 
+    /**
+     * Updates the like status of a tweet both locally and in the API.
+     * @param client The TwitterClient.
+     */
     public void like(TwitterClient client) {
         likeCount++;
         isFavorited = true;
@@ -153,6 +169,10 @@ public class Tweet {
         });
     }
 
+    /**
+     * Updates the retweet status of a tweet both locally and in the API.
+     * @param client The TwitterClient.
+     */
     public void unRetweet(TwitterClient client) {
         if (retweetCount > 0) {
             retweetCount--;
@@ -171,6 +191,10 @@ public class Tweet {
         });
     }
 
+    /**
+     * Updates the retweet status of a tweet both locally and in the API.
+     * @param client The TwitterClient.
+     */
     public void retweet(TwitterClient client) {
         retweetCount++;
         isRetweeted = true;

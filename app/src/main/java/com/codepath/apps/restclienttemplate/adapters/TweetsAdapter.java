@@ -226,12 +226,12 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                     if (tweet.isFavorited) {
                         tweet.unlike(client);
                         ivTweetLike.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_heart_stroke));
-                        tvTweetLikeCount.setText(Long.toString(tweet.likeCount));
                     } else {
                         tweet.like(client);
                         ivTweetLike.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_heart));
-                        tvTweetLikeCount.setText(Long.toString(tweet.likeCount));
+
                     }
+                    tvTweetLikeCount.setText(String.valueOf(tweet.likeCount));
                 }
             });
 
@@ -259,6 +259,27 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                     ComposeTweetFragment composeTweetFragment = ComposeTweetFragment.newInstance("DetailReply", context, tweet);
                     composeTweetFragment.show(fm, "fragment_compose_tweet");
                     //Handle dismissal HEERREEE
+                    composeTweetFragment.setComposeListener(new ComposeTweetFragment.ComposeListener() {
+                        @Override
+                        public void onDialogReady(String title) {
+                            Log.i(TAG, "Title: " + title);
+                        }
+
+                        @Override
+                        public void onTweetLoaded(Tweet tweet) {
+                            //Pass activity if I add replies here
+                            Log.i(TAG, "Load tweet into recycler");
+//                    //Get data from intent, in this case the tweet object
+//                    Tweet tweet =
+//                            Parcels.unwrap(data.getParcelableExtra("tweet"));
+                            //Update RecView with new tweet
+                            tweets.add(0, tweet);
+                            //Updated adapter
+                            notifyItemInserted(0);
+                            //Scroll to top to view composed tweet
+                            //rvTweets.smoothScrollToPosition(0);
+                        }
+                    });
                 }
             });
 

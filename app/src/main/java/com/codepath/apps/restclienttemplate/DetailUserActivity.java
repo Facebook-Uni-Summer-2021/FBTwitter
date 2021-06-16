@@ -29,6 +29,9 @@ import java.util.List;
 
 import okhttp3.Headers;
 
+/**
+ * Create viewable lists of a user's friends and followers
+ */
 public class DetailUserActivity extends AppCompatActivity {
     private static final String TAG = "DetailUserActivity";
 
@@ -66,12 +69,17 @@ public class DetailUserActivity extends AppCompatActivity {
         getFollowers(user.id);
     }
 
+    /**
+     * To handle async speed, used chained methods to fill list of followers and following.
+     * @param userId The ID of a user to find their profile information.
+     */
     private void getFollowers (final long userId) {
         client.getFollowers(userId, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
                 try {
                     Log.i(TAG, "Json followers: " + json);
+                    //User json has more information, so just get users array
                     JSONArray results = json.jsonObject.getJSONArray("users");
                     Log.i(TAG, "Json followers (results): " + results.getJSONObject(0));
                     followers.addAll(User.fromUserJson(results));
@@ -80,7 +88,6 @@ public class DetailUserActivity extends AppCompatActivity {
                     Log.e(TAG, "Json exception: " + e);
                 }
                 getFollowing(userId);
-
             }
 
             @Override
@@ -95,7 +102,7 @@ public class DetailUserActivity extends AppCompatActivity {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
                 try {
-                    Log.i(TAG, "Json followering: " + json);
+                    Log.i(TAG, "Json following: " + json);
                     JSONArray results = json.jsonObject.getJSONArray("users");
                     Log.i(TAG, "Json followers (results): " + results.getJSONObject(0));
                     following.addAll(User.fromUserJson(results));
@@ -161,6 +168,7 @@ public class DetailUserActivity extends AppCompatActivity {
         tvDetailScreenName.setText(user.screenName);
         Glide.with(context).load(user.profileImageUrl).into(ivDetailProfile);
 
+        //Set up a ridiculous handler to view both following and followers RecyclerView
         btnFollowing.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -11,6 +11,9 @@ import com.codepath.apps.restclienttemplate.models.SampleModel;
 import com.codepath.apps.restclienttemplate.models.SampleModelDao;
 import com.codepath.oauth.OAuthLoginActionBarActivity;
 
+/**
+ * Uses OAuth for REST clients. This was taken from a GitHub CodePath repo.
+ */
 public class LoginActivity extends OAuthLoginActionBarActivity<TwitterClient> {
 	private static final String TAG = "LoginActivity";
 

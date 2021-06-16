@@ -23,6 +23,10 @@ import org.parceler.Parcels;
 
 import okhttp3.Headers;
 
+/**
+ * Creates a DialogFragment/Modal to represent composing a tweet based
+ * on where the tweet is being composed.
+ */
 public class ComposeTweetFragment extends DialogFragment {
     private static final String TAG = "ComposeTweetFragment";
     private static final int MAX_TWEET_LENGTH = 280;
@@ -40,7 +44,7 @@ public class ComposeTweetFragment extends DialogFragment {
     private EditText etComposeModal;
     private Button btnModalTweet;
 
-    //Create interface in Fragment
+    //Create interface in Fragment to pass data
     public interface ComposeListener {
         //???
         public void onDialogReady (String title);
@@ -48,6 +52,7 @@ public class ComposeTweetFragment extends DialogFragment {
         public void onTweetLoaded (Tweet tweet);
     }
 
+    //Set the listener
     public void setComposeListener (ComposeListener listener) {
         this.listener = listener;
     }
@@ -61,7 +66,14 @@ public class ComposeTweetFragment extends DialogFragment {
     public ComposeTweetFragment () {
     }
 
-    //Use in place of constructor
+    /**
+     * Used in place of constructor; defines/initializes the
+     * compose fragment/modal.
+     * @param activity Title of the activity the modal was created in.
+     * @param context Context of activity.
+     * @param tweet If a reply is made, which tweet to reply to. Can be null if not reply.
+     * @return New Fragment
+     */
     public static ComposeTweetFragment newInstance (String activity, Context context, Tweet tweet) {
         ComposeTweetFragment frag = new ComposeTweetFragment();
         Bundle args = new Bundle();
@@ -144,6 +156,9 @@ public class ComposeTweetFragment extends DialogFragment {
                                         context.setResult(RESULT_OK, intent);
                                         finish();
                                          */
+                                            //Since we cannot pass intents in a DialogFragment,
+                                            // create an interface to pass data to activity
+                                            // where modal was created
                                             if (listener != null) {
                                                 listener.onTweetLoaded(tweet);
                                             }
