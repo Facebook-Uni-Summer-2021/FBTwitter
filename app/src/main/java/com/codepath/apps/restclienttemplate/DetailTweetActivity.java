@@ -71,6 +71,9 @@ public class DetailTweetActivity extends AppCompatActivity {
 //        tvLikeCount = findViewById(R.id.tvLikeCount);
 //        tvRetweetCount = findViewById(R.id.tvRetweetCount);
 
+        Log.e(TAG, "Current tweet: " + tweet.tweetId);
+        Log.e(TAG, "Current tweet like status: " + tweet.isFavorited);
+
         binding.tvScreenName.setText(tweet.user.screenName);
         binding.tvName.setText("@" + tweet.user.name);
         binding.tvTime.setText(Tweet.getRelativeTimeAgo(tweet.createdAt));
@@ -81,16 +84,16 @@ public class DetailTweetActivity extends AppCompatActivity {
         //It seems tweets are not updated at any speed at all; I have no idea why it
         // is not correctly saving?
         if (tweet.isFavorited) {
-            binding.ivLike.setImageDrawable(getDrawable(android.R.drawable.star_big_on));
+            binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart));
         } else {
-            binding.ivLike.setImageDrawable(getDrawable(android.R.drawable.star_big_off));
+            binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart_stroke));
         }
 
         //I need a drawable to switch to
         if (tweet.isRetweeted) {
-            binding.ivRetweet.setBackgroundColor(Color.parseColor("#ACEDAE"));
+            binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet));
         } else {
-            binding.ivRetweet.setBackgroundColor(Color.parseColor("#FFFFFF"));
+            binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet_stroke));
         }
 
         //Use Glide for images with URLs
@@ -111,7 +114,7 @@ public class DetailTweetActivity extends AppCompatActivity {
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
                             Log.i(TAG, "unlike tweet");
                             //Refresh tweets
-                            binding.ivLike.setImageDrawable(getDrawable(android.R.drawable.star_big_off));
+                            binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart_stroke));
                         }
 
                         @Override
@@ -125,7 +128,7 @@ public class DetailTweetActivity extends AppCompatActivity {
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
                             Log.i(TAG, "like tweet");
                             //Refresh tweets
-                            binding.ivLike.setImageDrawable(getDrawable(android.R.drawable.star_big_on));
+                            binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart));
                         }
 
                         @Override
@@ -148,7 +151,7 @@ public class DetailTweetActivity extends AppCompatActivity {
                     client.unretweet(tweet.tweetId, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
-                            binding.ivRetweet.setBackgroundColor(Color.parseColor("#FFFFFF"));
+                            binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet_stroke));
                         }
 
                         @Override
@@ -160,7 +163,7 @@ public class DetailTweetActivity extends AppCompatActivity {
                     client.retweet(tweet.tweetId, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
-                            binding.ivRetweet.setBackgroundColor(Color.parseColor("#ACEDAE"));
+                            binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet));
                         }
 
                         @Override
@@ -169,6 +172,19 @@ public class DetailTweetActivity extends AppCompatActivity {
                         }
                     });
                 }
+            }
+        });
+
+        binding.ivProfileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "View Profile");
+                Intent intent = new Intent(DetailTweetActivity.this, DetailUserActivity.class);
+                intent.putExtra("user", Parcels.wrap(tweet.user));
+//                context.startActivity(intent);
+//                intent.putExtra("userId", tweet.user.id);
+//                intent.putExtra("userImage", tweet.user.profileImageUrl);
+                startActivity(intent);
             }
         });
     }

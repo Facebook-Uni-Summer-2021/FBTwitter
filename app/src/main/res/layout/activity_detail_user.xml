@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rlProfile"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DetailUserActivity">
+
+    <ImageView
+        android:id="@+id/ivDetailProfile"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/tvDetailName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_toEndOf="@+id/ivDetailProfile"
+        tools:text="UserName" />
+
+    <!--Referred to as "friends"-->
+    <Button
+        android:id="@+id/btnFollowing"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:text="Following"
+        android:layout_below="@+id/tvDesc"
+        android:layout_toEndOf="@+id/ivDetailProfile"
+        android:textColor="#47C4E6"/>
+
+    <Button
+        android:id="@+id/btnFollowers"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:text="Followers"
+        android:layout_toEndOf="@+id/btnFollowing"
+        android:layout_below="@id/tvDesc"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvFollowers"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/btnFollowers"
+        android:visibility="invisible"
+        android:layout_marginTop="0dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvFollowing"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/btnFollowers"
+        android:layout_marginTop="0dp" />
+
+    <TextView
+        android:id="@+id/tvDetailScreenName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvDetailName"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="0dp"
+        android:layout_toEndOf="@+id/ivDetailProfile"
+        android:text="TextView" />
+
+    <TextView
+        android:id="@+id/tvDesc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvDetailScreenName"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_toEndOf="@+id/ivDetailProfile"
+        tools:text="Description!!!" />
+
+</RelativeLayout>
