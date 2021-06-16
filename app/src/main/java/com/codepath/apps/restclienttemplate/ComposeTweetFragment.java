@@ -162,7 +162,7 @@ public class ComposeTweetFragment extends DialogFragment {
                                         Log.e(TAG, "onFailure: ", throwable);
                                     }
                                 });
-                    } else if (activity.compareTo(DETAIL_REPLY) == 0) {
+                    } else if (activity.compareTo(DETAIL_REPLY) == 0 || activity.compareTo(TIMELINE_REPLY) == 0) {
                         String replyTweet = "@" + tweet.user.screenName + " " + tweetContent;
                         client.replyTweet(replyTweet, tweet.tweetId, new JsonHttpResponseHandler() {
                             @Override

@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.util.Log;
@@ -47,6 +48,7 @@ public class TimelineActivity extends AppCompatActivity {
     private SwipeRefreshLayout srlTweets;
     private EndlessRecyclerViewScrollListener scrollListener;
 
+    FragmentManager fm;
     TwitterClient client;
     RecyclerView rvTweets;
     TweetsAdapter adapter;
@@ -59,8 +61,10 @@ public class TimelineActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
-//        Toolbar toolbar = findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setBackgroundColor(Color.parseColor("#07CCD9"));
+        setSupportActionBar(toolbar);
+        fm = getSupportFragmentManager();
         Log.i(TAG, "onCreate");
         isCreated = true;
 
@@ -93,7 +97,7 @@ public class TimelineActivity extends AppCompatActivity {
         tweets = new ArrayList<>();
 
         //Set layout manager and adapter
-        adapter = new TweetsAdapter(this, tweets);
+        adapter = new TweetsAdapter(this, tweets, fm);
         LinearLayoutManager layoutManager =
                 new LinearLayoutManager(this);
         rvTweets.setLayoutManager(layoutManager);
@@ -174,7 +178,7 @@ public class TimelineActivity extends AppCompatActivity {
             return true;
             //True means item was successful
              */
-            FragmentManager fm = getSupportFragmentManager();
+            //FragmentManager fm = getSupportFragmentManager();
             ComposeTweetFragment composeTweetFragment = ComposeTweetFragment.newInstance("ComposeTweet", this, null);
             composeTweetFragment.show(fm, "fragment_compose_tweet");
 
@@ -201,6 +205,14 @@ public class TimelineActivity extends AppCompatActivity {
             });
 
 
+        } else if (item.getItemId() == R.id.mSignOut) {
+
+            client.clearAccessToken();
+            // go back to the login activity
+            Intent i = new Intent(this, LoginActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
         }
 
         return super.onOptionsItemSelected(item);

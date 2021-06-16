@@ -1,6 +1,12 @@
 package com.codepath.apps.restclienttemplate.models;
 
 import android.text.format.DateUtils;
+import android.util.Log;
+
+import com.codepath.apps.restclienttemplate.R;
+import com.codepath.apps.restclienttemplate.TwitterApp;
+import com.codepath.apps.restclienttemplate.TwitterClient;
+import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,6 +18,8 @@ import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+
+import okhttp3.Headers;
 
 //Required by Parceler
 @Parcel
@@ -99,5 +107,41 @@ public class Tweet {
         }
 
         return relativeDate;
+    }
+
+    public void unlike(TwitterClient client) {
+        if (likeCount > 0) {
+            likeCount--;
+        }
+
+        client.unlikeTweet(tweetId, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                Log.i(TAG, "unlike tweet");
+                isFavorited = false;
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                Log.e(TAG, "onUnlikeFailure: " + response, throwable);
+            }
+        });
+    }
+
+    public void like(TwitterClient client) {
+        likeCount++;
+
+        client.likeTweet(tweetId, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                Log.i(TAG, "like tweet");
+                isFavorited = true;
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                Log.e(TAG, "onLikeFailure: " + response, throwable);
+            }
+        });
     }
 }

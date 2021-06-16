@@ -14,7 +14,7 @@
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
-        android:id="@+id/tvScreenName"
+        android:id="@+id/tvName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -38,20 +38,22 @@
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="0dp"
         android:layout_toEndOf="@+id/ivProfileImage"
-        android:textSize="16sp"
         android:autoLink="all"
         android:linksClickable="true"
+        android:textSize="16sp"
         tools:text="Well, hot diggity dang! There is a real tweet in here OMG!!!" />
 
+    <!--Flip-flopped tvName and screenName, CHECK IT-->
+
     <TextView
-        android:id="@+id/tvName"
+        android:id="@+id/tvScreenName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginTop="0dp"
         android:layout_marginEnd="0dp"
         android:layout_marginBottom="0dp"
-        android:layout_toEndOf="@+id/tvScreenName"
+        android:layout_toEndOf="@+id/tvName"
         android:textColor="#8D000000"
         android:textSize="14sp"
         tools:text="atRealName" />
@@ -77,7 +79,7 @@
         android:layout_marginTop="0dp"
         android:layout_marginEnd="0dp"
         android:layout_marginBottom="0dp"
-        android:layout_toEndOf="@+id/tvName"
+        android:layout_toEndOf="@+id/tvScreenName"
         app:srcCompat="@android:drawable/presence_invisible" />
 
     <ImageView
@@ -92,4 +94,64 @@
         android:layout_marginBottom="0dp"
         android:layout_toEndOf="@+id/ivProfileImage"
         tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageView
+        android:id="@+id/ivTweetLike"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivMedia"
+        android:layout_margin="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
+        android:layout_toEndOf="@+id/ivProfileImage"
+        app:srcCompat="@drawable/ic_vector_heart_stroke" />
+
+    <TextView
+        android:id="@+id/tvTweetLikeCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivMedia"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="0dp"
+        android:layout_toEndOf="@+id/ivTweetLike"
+        tools:text="1234" />
+
+    <ImageView
+        android:id="@+id/ivTweetRetweet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivMedia"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="0dp"
+        android:layout_toEndOf="@+id/tvTweetLikeCount"
+        app:srcCompat="@drawable/ic_vector_retweet_stroke" />
+
+    <TextView
+        android:id="@+id/tvTweetRetweetCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivMedia"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="0dp"
+        android:layout_toEndOf="@+id/ivTweetRetweet"
+        tools:text="1234" />
+
+    <ImageView
+        android:id="@+id/ivTweetReply"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivMedia"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="0dp"
+        android:layout_toEndOf="@+id/tvTweetRetweetCount"
+        app:srcCompat="@drawable/ic_vector_messages_stroke" />
+
 </RelativeLayout>

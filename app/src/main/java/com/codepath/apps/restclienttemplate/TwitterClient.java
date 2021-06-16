@@ -9,6 +9,8 @@ import com.github.scribejava.apis.FlickrApi;
 import com.github.scribejava.apis.TwitterApi;
 import com.github.scribejava.core.builder.api.BaseApi;
 
+import okhttp3.Headers;
+
 /*
  * 
  * This is the object responsible for communicating with a REST API. 
@@ -111,7 +113,7 @@ public class TwitterClient extends OAuthBaseClient {
 	}
 
 	public void unlikeTweet (long tweetId,
-						   JsonHttpResponseHandler handler) {
+							 final JsonHttpResponseHandler handler) {
 		//REMEMBER: API URL is the link for RESTful actions
 		String apiUrl = getApiUrl("favorites/destroy.json");
 		RequestParams params = new RequestParams();

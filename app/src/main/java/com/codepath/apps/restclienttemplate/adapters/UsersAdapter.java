@@ -1,6 +1,8 @@
 package com.codepath.apps.restclienttemplate.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +13,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.codepath.apps.restclienttemplate.DetailUserActivity;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.models.User;
+
+import org.parceler.Parcels;
 
 import java.util.List;
 
@@ -40,6 +45,8 @@ onBindViewHolder - populates data into view through ViewHolder
 getItemCount - returns total items of items list
 */
 public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> {
+    private static final String TAG = "UsersAdapter";
+
     Context context;
     List<User> users;
 
@@ -84,12 +91,24 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
             ivUserVerified = itemView.findViewById(R.id.ivUserVerified);
         }
 
-        public void bind(User user) {
+        public void bind(final User user) {
             tvUserName.setText(user.name);
             tvUserScreenName.setText(user.screenName);
             tvUserDesc.setText(user.desc);
             //Glide set image
             Glide.with(context).load(user.profileImageUrl).into(ivUserImage);
+            ivUserImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.i(TAG, "View Profile");
+                    Intent intent = new Intent(context, DetailUserActivity.class);
+                    intent.putExtra("user", Parcels.wrap(user));
+//                context.startActivity(intent);
+//                intent.putExtra("userId", tweet.user.id);
+//                intent.putExtra("userImage", tweet.user.profileImageUrl);
+                    context.startActivity(intent);
+                }
+            });
         }
     }
 }

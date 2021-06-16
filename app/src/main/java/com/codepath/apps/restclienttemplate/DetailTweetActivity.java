@@ -111,34 +111,13 @@ public class DetailTweetActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.i(TAG, "onClick Like");
+
                 if (tweet.isFavorited) {
-                    client.unlikeTweet(tweet.tweetId, new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Headers headers, JSON json) {
-                            Log.i(TAG, "unlike tweet");
-                            //Refresh tweets
-                            binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart_stroke));
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                            Log.e(TAG, "onUnlikeFailure: " + response, throwable);
-                        }
-                    });
+                    tweet.unlike(client);
+                    binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart_stroke));
                 } else {
-                    client.likeTweet(tweet.tweetId, new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Headers headers, JSON json) {
-                            Log.i(TAG, "like tweet");
-                            //Refresh tweets
-                            binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart));
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                            Log.e(TAG, "onLikeFailure: " + response, throwable);
-                        }
-                    });
+                    tweet.like(client);
+                    binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart));
                 }
             }
         });

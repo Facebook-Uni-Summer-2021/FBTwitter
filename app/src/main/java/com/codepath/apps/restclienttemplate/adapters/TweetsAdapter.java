@@ -12,14 +12,22 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.GlideException;
+import com.codepath.apps.restclienttemplate.ComposeTweetFragment;
 import com.codepath.apps.restclienttemplate.DetailTweetActivity;
+import com.codepath.apps.restclienttemplate.DetailUserActivity;
 import com.codepath.apps.restclienttemplate.R;
+import com.codepath.apps.restclienttemplate.TimelineActivity;
+import com.codepath.apps.restclienttemplate.TwitterApp;
+import com.codepath.apps.restclienttemplate.TwitterClient;
 import com.codepath.apps.restclienttemplate.models.Media;
 import com.codepath.apps.restclienttemplate.models.Tweet;
+import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
 import org.parceler.Parcels;
 
@@ -27,6 +35,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
+
+import okhttp3.Headers;
 
 public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder> {
     /*
@@ -54,12 +64,16 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
     */
     private static final String TAG = "TweetsAdapter";
 
+    TwitterClient client;
+    FragmentManager fm;
     Context context;
     List<Tweet> tweets;
 
-    public TweetsAdapter(Context context, List<Tweet> tweets) {
+    public TweetsAdapter(Context context, List<Tweet> tweets, FragmentManager fm) {
         this.context = context;
         this.tweets = tweets;
+        this.fm = fm;
+        client = TwitterApp.getRestClient(context);
     }
 
     @NonNull
@@ -103,8 +117,13 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         TextView tvName;
         TextView tvTime;
         TextView tvBody;
+        TextView tvTweetLikeCount;
+        TextView tvTweetRetweetCount;
         ImageView ivProfileImage;
         ImageView ivMedia;
+        ImageView ivTweetLike;
+        ImageView ivTweetRetweet;
+        ImageView ivTweetReply;
 
         RelativeLayout rlTweet;
 
@@ -116,16 +135,23 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             tvName = itemView.findViewById(R.id.tvName);
             tvTime = itemView.findViewById(R.id.tvTime);
             tvBody = itemView.findViewById(R.id.tvBody);
+            tvTweetLikeCount = itemView.findViewById(R.id.tvTweetLikeCount);
+            tvTweetRetweetCount = itemView.findViewById(R.id.tvTweetRetweetCount);
             ivProfileImage = itemView.findViewById(R.id.ivProfileImage);
             ivMedia = itemView.findViewById(R.id.ivMedia);
+            ivTweetLike = itemView.findViewById(R.id.ivTweetLike);
+            ivTweetRetweet = itemView.findViewById(R.id.ivTweetRetweet);
+            ivTweetReply = itemView.findViewById(R.id.ivTweetReply);
             rlTweet = itemView.findViewById(R.id.rlTweet);
         }
 
         public void bind(final Tweet tweet) {
-            tvScreenName.setText(tweet.user.screenName);
-            tvName.setText("@" + tweet.user.name);
+            tvScreenName.setText("@" + tweet.user.screenName);
+            tvName.setText(tweet.user.name);
             tvTime.setText(Tweet.getRelativeTimeAgo(tweet.createdAt));
             tvBody.setText(tweet.body);
+            tvTweetLikeCount.setText(String.valueOf(tweet.likeCount));
+            tvTweetRetweetCount.setText(String.valueOf(tweet.retweetCount));
 
             //Use Glide for images with URLs
             Glide.with(context)
@@ -176,6 +202,89 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                     //Create detailed tweet with like/dislike
                     Intent intent = new Intent(context, DetailTweetActivity.class);
                     intent.putExtra("tweet", Parcels.wrap(tweet));
+                    context.startActivity(intent);
+                }
+            });
+
+            if (tweet.isFavorited) {
+                ivTweetLike.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_heart));
+            } else {
+                ivTweetLike.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_heart_stroke));
+            }
+
+            if (tweet.isRetweeted) {
+                ivTweetRetweet.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_retweet));
+            } else {
+                ivTweetRetweet.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_retweet_stroke));
+            }
+
+            ivTweetLike.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (tweet.isFavorited) {
+                        tweet.unlike(client);
+                        ivTweetLike.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_heart_stroke));
+                        tvTweetLikeCount.setText(Long.toString(tweet.likeCount));
+                    } else {
+                        tweet.like(client);
+                        ivTweetLike.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_heart));
+                        tvTweetLikeCount.setText(Long.toString(tweet.likeCount));
+                    }
+                }
+            });
+
+            ivTweetRetweet.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (tweet.isRetweeted) {
+                        client.unlikeTweet(tweet.tweetId, new JsonHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                                ivTweetRetweet.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_retweet_stroke));
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                                Log.e(TAG, "Error unreweeting: " + response, throwable);
+                            }
+                        });
+                    } else {
+                        client.retweet(tweet.tweetId, new JsonHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                                ivTweetRetweet.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_retweet));
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                                Log.e(TAG, "Error reweeting: " + response, throwable);
+                            }
+                        });
+                    }
+                }
+            });
+
+            ivTweetReply.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.i(TAG, "Reply to tweet: " + tweet.tweetId);
+
+                    //FragmentManager fm = getSupportFragmentManager();
+                    ComposeTweetFragment composeTweetFragment = ComposeTweetFragment.newInstance("DetailReply", context, tweet);
+                    composeTweetFragment.show(fm, "fragment_compose_tweet");
+                    //Handle dismissal HEERREEE
+                }
+            });
+
+            ivProfileImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.i(TAG, "View Profile");
+                    Intent intent = new Intent(context, DetailUserActivity.class);
+                    intent.putExtra("user", Parcels.wrap(tweet.user));
+//                context.startActivity(intent);
+//                intent.putExtra("userId", tweet.user.id);
+//                intent.putExtra("userImage", tweet.user.profileImageUrl);
                     context.startActivity(intent);
                 }
             });
