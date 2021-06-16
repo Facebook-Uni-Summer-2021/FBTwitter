@@ -1,6 +1,7 @@
 package com.codepath.apps.restclienttemplate;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -73,6 +74,8 @@ public class DetailTweetActivity extends AppCompatActivity {
 
         Log.e(TAG, "Current tweet: " + tweet.tweetId);
         Log.e(TAG, "Current tweet like status: " + tweet.isFavorited);
+        Log.e(TAG, "Name: " + tweet.user.name);
+        Log.e(TAG, "ScrenName: " + tweet.user.screenName);
 
         binding.tvScreenName.setText(tweet.user.screenName);
         binding.tvName.setText("@" + tweet.user.name);
@@ -185,6 +188,32 @@ public class DetailTweetActivity extends AppCompatActivity {
 //                intent.putExtra("userId", tweet.user.id);
 //                intent.putExtra("userImage", tweet.user.profileImageUrl);
                 startActivity(intent);
+            }
+        });
+
+        binding.ivReply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //REQUIRES "@screenname"
+                Log.i(TAG, "Reply to tweet: " + tweet.tweetId);
+
+                FragmentManager fm = getSupportFragmentManager();
+                ComposeTweetFragment composeTweetFragment = ComposeTweetFragment.newInstance("DetailReply", DetailTweetActivity.this, tweet);
+                composeTweetFragment.show(fm, "fragment_compose_tweet");
+
+//                //Compose message
+//                String temp = "@" + tweet.user.screenName + " " + "Temp tweet content here!";
+//                client.replyTweet(temp, tweet.tweetId, new JsonHttpResponseHandler() {
+//                    @Override
+//                    public void onSuccess(int statusCode, Headers headers, JSON json) {
+//                        Log.i(TAG, "made a reply");
+//                    }
+//
+//                    @Override
+//                    public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+//                        Log.i(TAG, "Reply failed: " + response, throwable);
+//                    }
+//                });
             }
         });
     }

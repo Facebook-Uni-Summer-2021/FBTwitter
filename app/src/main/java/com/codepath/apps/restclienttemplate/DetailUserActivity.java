@@ -117,21 +117,21 @@ public class DetailUserActivity extends AppCompatActivity {
     private void create () {
         //A bunch of notes
         Log.e(TAG, "inCreate");
-        try {
-            for (int i = 0; i < followers.size(); i++) {
-                Log.i(TAG, "Follower: " + followers.get(i).screenName);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error: " + e);
-        }
-
-        try {
-            for (int i = 0; i < following.size(); i++) {
-                Log.i(TAG, "Following: " + following.get(i).screenName);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error: " + e);
-        }
+//        try {
+//            for (int i = 0; i < followers.size(); i++) {
+//                Log.i(TAG, "Follower: " + followers.get(i).screenName);
+//            }
+//        } catch (Exception e) {
+//            Log.e(TAG, "Error: " + e);
+//        }
+//
+//        try {
+//            for (int i = 0; i < following.size(); i++) {
+//                Log.i(TAG, "Following: " + following.get(i).screenName);
+//            }
+//        } catch (Exception e) {
+//            Log.e(TAG, "Error: " + e);
+//        }
 
         //Find RecyclerView
         rvFollower = findViewById(R.id.rvFollowers);

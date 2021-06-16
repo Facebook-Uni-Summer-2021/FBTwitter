@@ -90,6 +90,15 @@ public class TwitterClient extends OAuthBaseClient {
 		client.post(apiUrl, params, "", handler);
 	}
 
+	public void replyTweet (String tweetContent, long tweetId, JsonHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("statuses/update.json");
+		RequestParams params = new RequestParams();
+		params.put("status", tweetContent);
+		params.put("in_reply_to_status_id", tweetId);
+		params.put("auto_populate_reply_metadata", true);
+		client.post(apiUrl, params, "", handler);
+	}
+
 	public void likeTweet (long tweetId,
 						   JsonHttpResponseHandler handler) {
 		//REMEMBER: API URL is the link for RESTful actions

@@ -28,9 +28,14 @@ public class ComposeTweetFragment extends DialogFragment {
     private static final int MAX_TWEET_LENGTH = 280;
     private ComposeListener listener;
 
+    private final String COMPOSE = "ComposeTweet";
+    private final String DETAIL_REPLY = "DetailReply";
+    private final String TIMELINE_REPLY = "TimelineReply";
+
     TwitterClient client;
     static Context context;
-    Tweet tweet;
+    static String activity;
+    static Tweet tweet;
 
     private EditText etComposeModal;
     private Button btnModalTweet;
@@ -57,12 +62,14 @@ public class ComposeTweetFragment extends DialogFragment {
     }
 
     //Use in place of constructor
-    public static ComposeTweetFragment newInstance (String activity, Context context) {
+    public static ComposeTweetFragment newInstance (String activity, Context context, Tweet tweet) {
         ComposeTweetFragment frag = new ComposeTweetFragment();
         Bundle args = new Bundle();
         args.putString("title", activity);
+        ComposeTweetFragment.activity = activity;
         frag.setArguments(args);
         ComposeTweetFragment.context = context;
+        ComposeTweetFragment.tweet = tweet;
         return frag;
     }
 
@@ -111,19 +118,21 @@ public class ComposeTweetFragment extends DialogFragment {
                     Toast.makeText(context,
                             "Tweet tweeted!",
                             Toast.LENGTH_SHORT).show();
-                    client.publishTweet(tweetContent,
-                            new JsonHttpResponseHandler() {
-                                //We expect to post a tweet with the
-                                // appropriate model
-                                @Override
-                                public void onSuccess(int statusCode,
-                                                      Headers headers,
-                                                      JSON json) {
-                                    Log.i(TAG, "onSuccess");
-                                    try {
-                                        Tweet tweet = Tweet.fromJson(json.jsonObject);
-                                        Log.i(TAG, "Published tweet: " +
-                                                tweet);
+
+                    if (activity.compareTo(COMPOSE) == 0) {
+                        client.publishTweet(tweetContent,
+                                new JsonHttpResponseHandler() {
+                                    //We expect to post a tweet with the
+                                    // appropriate model
+                                    @Override
+                                    public void onSuccess(int statusCode,
+                                                          Headers headers,
+                                                          JSON json) {
+                                        Log.i(TAG, "onSuccess");
+                                        try {
+                                            Tweet tweet = Tweet.fromJson(json.jsonObject);
+                                            Log.i(TAG, "Published tweet: " +
+                                                    tweet);
                                         /* Use
                                         //Create new intent to pass information
                                         // from child (current) intent to parent
@@ -135,24 +144,52 @@ public class ComposeTweetFragment extends DialogFragment {
                                         context.setResult(RESULT_OK, intent);
                                         finish();
                                          */
-                                        if (listener != null) {
-                                            listener.onTweetLoaded(tweet);
+                                            if (listener != null) {
+                                                listener.onTweetLoaded(tweet);
+                                            }
+                                            dismiss();
+
+                                        } catch (JSONException e) {
+                                            Log.e(TAG, "onFailure: ", e);
                                         }
-                                        dismiss();
-
-                                    } catch (JSONException e) {
-                                        Log.e(TAG, "onFailure: ", e);
                                     }
-                                }
 
-                                @Override
-                                public void onFailure(int statusCode,
-                                                      Headers headers,
-                                                      String response,
-                                                      Throwable throwable) {
-                                    Log.e(TAG, "onFailure: ", throwable);
+                                    @Override
+                                    public void onFailure(int statusCode,
+                                                          Headers headers,
+                                                          String response,
+                                                          Throwable throwable) {
+                                        Log.e(TAG, "onFailure: ", throwable);
+                                    }
+                                });
+                    } else if (activity.compareTo(DETAIL_REPLY) == 0) {
+                        String replyTweet = "@" + tweet.user.screenName + " " + tweetContent;
+                        client.replyTweet(replyTweet, tweet.tweetId, new JsonHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                                //Make sure to place listeners!!!
+                                Log.i(TAG, "OnSuccessful reply tweet");
+                                try {
+                                    Tweet tweet = Tweet.fromJson(json.jsonObject);
+                                    Log.i(TAG, "Published tweet: " + tweet);
+                                    if (listener != null) {
+                                        listener.onTweetLoaded(tweet);
+                                    }
+                                    dismiss();
+
+                                } catch (JSONException e) {
+                                    Log.e(TAG, "onFailure: ", e);
                                 }
-                            });
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+
+                            }
+                        });
+                    }
+
+
                 }
             }
         });

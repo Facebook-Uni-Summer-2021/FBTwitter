@@ -16,6 +16,8 @@ import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+//import android.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar;
 
 import com.codepath.apps.restclienttemplate.adapters.TweetsAdapter;
 import com.codepath.apps.restclienttemplate.models.Tweet;
@@ -57,6 +59,8 @@ public class TimelineActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
+//        Toolbar toolbar = findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
         Log.i(TAG, "onCreate");
         isCreated = true;
 
@@ -171,7 +175,7 @@ public class TimelineActivity extends AppCompatActivity {
             //True means item was successful
              */
             FragmentManager fm = getSupportFragmentManager();
-            ComposeTweetFragment composeTweetFragment = ComposeTweetFragment.newInstance("Compose tweet", this);
+            ComposeTweetFragment composeTweetFragment = ComposeTweetFragment.newInstance("ComposeTweet", this, null);
             composeTweetFragment.show(fm, "fragment_compose_tweet");
 
             composeTweetFragment.setComposeListener(new ComposeTweetFragment.ComposeListener() {
@@ -182,6 +186,7 @@ public class TimelineActivity extends AppCompatActivity {
 
                 @Override
                 public void onTweetLoaded(Tweet tweet) {
+                    //Pass activity if I add replies here
                     Log.i(TAG, "Load tweet into recycler");
 //                    //Get data from intent, in this case the tweet object
 //                    Tweet tweet =

@@ -16,7 +16,9 @@
         <activity android:name=".DetailUserActivity"></activity>
         <activity android:name=".DetailTweetActivity" />
         <activity android:name=".ComposeActivity" />
-        <activity android:name=".TimelineActivity" />
+        <activity
+            android:name=".TimelineActivity"
+            />
         <activity
             android:name=".LoginActivity"
             android:label="@string/app_name"
