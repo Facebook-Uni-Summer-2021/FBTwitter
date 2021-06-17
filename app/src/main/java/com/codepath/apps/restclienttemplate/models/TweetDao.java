@@ -20,7 +20,7 @@ public interface TweetDao {
             "User.*" +
             "FROM Tweet INNER JOIN User " +
             "ON Tweet.userId = User.id " +
-            "ORDER BY Tweet.createdAt DESC LIMIT 5")
+            "ORDER BY Tweet.createdAt DESC LIMIT 20")
     //Gives us SQL table
     List<TweetWithUser> recentItems();
 
