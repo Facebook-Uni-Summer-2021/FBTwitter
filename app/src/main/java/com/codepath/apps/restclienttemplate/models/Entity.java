@@ -2,6 +2,8 @@ package com.codepath.apps.restclienttemplate.models;
 
 import android.util.Log;
 
+import androidx.room.ColumnInfo;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,9 +18,11 @@ import java.util.List;
  * in the Twitter API; original purpose to store media from a tweet
  */
 @Parcel
+//@androidx.room.Entity
 public class Entity {
     private static final String TAG = "Entity";
 
+    //@ColumnInfo
     public List<Media> medias;
 
     //Required for Parceler

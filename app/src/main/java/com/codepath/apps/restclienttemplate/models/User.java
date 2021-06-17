@@ -2,6 +2,10 @@ package com.codepath.apps.restclienttemplate.models;
 
 import android.util.Log;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,15 +17,29 @@ import java.util.List;
 
 //Since user is included in Tweet, User needs Parceler annotations
 @Parcel
+@Entity
 public class User {
     private static final String TAG = "User";
 
-    public String name;
-    public String screenName;//The "handle"?
-    public String profileImageUrl;
-    public String desc;
-    public boolean isVerified;
+    @ColumnInfo
+    @PrimaryKey
     public long id;
+
+    @ColumnInfo
+    public String name;
+
+    @ColumnInfo
+    public String screenName;//The "handle"?
+
+    @ColumnInfo
+    public String profileImageUrl;
+
+    @ColumnInfo
+    public String desc;
+
+    @ColumnInfo
+    public boolean isVerified;
+
 //    public List<User> followers;
 //    public List<User> friends;
 
@@ -53,6 +71,14 @@ public class User {
             Log.e(TAG, "no array found");
         }
 
+        return users;
+    }
+
+    public static List<User> fromJsonTweetArray(List<Tweet> tweetsFromNetwork) {
+        List<User> users = new ArrayList<>();
+        for (int i = 0; i < tweetsFromNetwork.size(); i++) {
+            users.add(tweetsFromNetwork.get(i).user);
+        }
         return users;
     }
 }

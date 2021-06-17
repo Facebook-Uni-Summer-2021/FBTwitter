@@ -106,8 +106,9 @@ public class DetailTweetActivity extends AppCompatActivity {
         Glide.with(this)
                 .load(tweet.user.profileImageUrl)
                 .into(binding.ivProfileImage);
-        List<Media> medias = tweet.entity.medias;
-        Glide.with(this).load(medias.get(0).mediaUrl).into(binding.ivMedia);
+        //List<Media> medias = tweet.entity.medias;
+//        Glide.with(this).load(medias.get(0).mediaUrl).into(binding.ivMedia);
+        Glide.with(this).load(tweet.mediaUrl).into(binding.ivMedia);
 
         //To deal with possible disconnect and to make it nicer, manually
         // change the values of the likeCount and ivLike to accurately display changes

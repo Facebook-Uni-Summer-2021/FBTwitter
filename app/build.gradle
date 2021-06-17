@@ -13,7 +13,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
 
-        // Room schemas
+        // Room schemas; instructions for how schema evolves over time
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]

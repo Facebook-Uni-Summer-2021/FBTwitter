@@ -147,6 +147,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         }
 
         public void bind(final Tweet tweet) {
+            Log.e(TAG, "Msg: " + tweet.user.screenName);
             tvScreenName.setText("@" + tweet.user.screenName);
             tvName.setText(tweet.user.name);
             tvTime.setText(Tweet.getRelativeTimeAgo(tweet.createdAt));
@@ -160,7 +161,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                     .load(tweet.user.profileImageUrl)
                     .into(ivProfileImage);
 
-            List<Media> medias = tweet.entity.medias;
+            //List<Media> medias = tweet.entity.medias;
 //            Media media = tweet.entity.medias.get(0);
 //            Log.i(TAG, tweet.user.screenName + "media: " + medias.get(0).mediaUrl);
 //            Log.i(TAG, "Avatar: " + tweet.user.profileImageUrl);
@@ -178,7 +179,9 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 //                Glide.with(context).load(medias.get(0).mediaUrl).into(ivMedia);
 //            }
 
-            Glide.with(context).load(medias.get(0).mediaUrl).into(ivMedia);
+            //Glide.with(context).load(medias.get(0).mediaUrl).into(ivMedia);
+            //Log.e(TAG, "Check: " + tweet.test);
+            Glide.with(context).load(tweet.mediaUrl).into(ivMedia);
 //            try {
 //                ivMedia.getLayoutParams().height = 150;
 //                ivMedia.getLayoutParams().width = 150;

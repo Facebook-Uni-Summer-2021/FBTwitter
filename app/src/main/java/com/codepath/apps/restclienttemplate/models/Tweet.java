@@ -1,7 +1,13 @@
 package com.codepath.apps.restclienttemplate.models;
 
+import android.provider.ContactsContract;
 import android.text.format.DateUtils;
 import android.util.Log;
+
+import androidx.room.ColumnInfo;
+import androidx.room.ForeignKey;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
 
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.TwitterApp;
@@ -26,18 +32,45 @@ import okhttp3.Headers;
  */
 //Required by Parceler
 @Parcel
+@androidx.room.Entity(foreignKeys = @ForeignKey(entity=User.class, parentColumns="id", childColumns="userId"))
 public class Tweet {
     private static final String TAG = "Tweet";
 
-    public String body;
-    public String createdAt;
+    @ColumnInfo
+    @PrimaryKey
     public long tweetId;
+
+    @ColumnInfo
+    public String body;
+
+    @ColumnInfo
+    public String createdAt;
+
+    @ColumnInfo
     public long likeCount;
+
+    @ColumnInfo
     public long retweetCount;
+
+    @ColumnInfo
     public boolean isRetweeted;
+
+    @ColumnInfo
     public boolean isFavorited;
+
+    @ColumnInfo
+    public long userId;
+
+    //Perhaps create a variable for the single media url?
+
+    @Ignore
     public User user;
-    public Entity entity;
+
+//    @Ignore
+//    public Entity entity;
+
+    @ColumnInfo
+    public String mediaUrl;
 
     //Required by Parceler
     public Tweet () {}
@@ -78,11 +111,28 @@ public class Tweet {
         //Create a user from the JSON Object stored in the API's
         // JSON (as we do in Tweet, we need to convert the object
         // from the JSON into a model)
-        tweet.user = User.fromJson(jsonObject.getJSONObject("user"));
+        User user = User.fromJson(jsonObject.getJSONObject("user"));
+        tweet.user = user;
+        tweet.userId = user.id;
 
         //Obtain the media from a tweet; entities are objects, what's in it
         // are arrays
-        tweet.entity = Entity.fromJson(jsonObject.getJSONObject("entities"));
+        //tweet.entity = Entity.fromJson(jsonObject.getJSONObject("entities"));
+        //tweet.mediaUrl = jsonObject.getJSONObject("entities").getJSONArray("media").getString(0);
+        //tweet.test = jsonObject.getJSONObject("entities");
+        //Log.e(TAG, tweet.user.screenName + ": " + jsonObject.getJSONObject("entities").getJSONArray("media"));
+        //JSONObject test1 = jsonObject.getJSONObject("entities");
+        if (jsonObject.getJSONObject("entities").has("media")) {
+            JSONArray media = jsonObject.getJSONObject("entities").getJSONArray("media");
+            Log.e(TAG, "Object: " + media);
+            //JSONObject url = media.getJSONObject(0);
+            Log.e(TAG, "URL: " + media.getJSONObject(0).getString("media_url_https"));
+            tweet.mediaUrl = media.getJSONObject(0).getString("media_url_https");
+        } else
+            tweet.mediaUrl = "";
+//        Log.i(TAG, "here: " + test1.toString());
+//        Log.e(TAG, "REEE" + tweet.entity.medias.get(0).mediaUrl);
+
         return tweet;
     }
 

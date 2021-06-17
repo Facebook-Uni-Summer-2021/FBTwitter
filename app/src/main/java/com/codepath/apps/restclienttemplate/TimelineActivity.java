@@ -9,6 +9,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.util.Log;
@@ -22,6 +23,9 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.codepath.apps.restclienttemplate.adapters.TweetsAdapter;
 import com.codepath.apps.restclienttemplate.models.Tweet;
+import com.codepath.apps.restclienttemplate.models.TweetDao;
+import com.codepath.apps.restclienttemplate.models.TweetWithUser;
+import com.codepath.apps.restclienttemplate.models.User;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -53,6 +57,7 @@ public class TimelineActivity extends AppCompatActivity {
 
     FragmentManager fm;
     TwitterClient client;
+    TweetDao tweetDao;
     RecyclerView rvTweets;
     TweetsAdapter adapter;
     List<Tweet> tweets;
@@ -96,6 +101,10 @@ public class TimelineActivity extends AppCompatActivity {
         //Create a client that contains tweets pulled
         // from method getRestClient()
         client = TwitterApp.getRestClient(this);
+
+        //Define Dao
+        tweetDao = ((TwitterApp) getApplicationContext()).getMyDatabase().tweetDao();
+
 
         //Find RecyclerView
         rvTweets = findViewById(R.id.rvTweets);
@@ -142,6 +151,24 @@ public class TimelineActivity extends AppCompatActivity {
         };
         rvTweets.addOnScrollListener(scrollListener);
         rvTweets.setAdapter(adapter);
+
+        //Query for existing tweets in DB;
+        // run on background thread
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "Showing data from DB");
+                List<TweetWithUser> tweetWithUsers =
+                        tweetDao.recentItems();
+
+                //Get tweets from TweetWithUser
+                List<Tweet> tweetsFromDB =
+                        TweetWithUser.getTweetList(tweetWithUsers);
+                adapter.clear();
+                adapter.addAll(tweetsFromDB);
+            }
+        });
+
         populateHomeTimeline();
     }
 
@@ -266,13 +293,17 @@ public class TimelineActivity extends AppCompatActivity {
         client.getHomeTimeline(new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
-                Log.i(TAG, "onPopulateTimelineSuccess: " + json.toString());
+                Log.i(TAG, "onPopulateTimelineSuccess json: " + json.toString());
                 JSONArray results = json.jsonArray;
                 try {
+                    //Tweet DB
+                    final List<Tweet> tweetsFromNetwork =
+                            Tweet.fromJsonArray(results);
+
                     //Clear the adapter to ensure no errors occur
                     tweets.clear();
                     adapter.clear();
-                    tweets.addAll(Tweet.fromJsonArray(results));
+                    tweets.addAll(tweetsFromNetwork);
                     //Is this necessary, since we call for Notify?
                     //adapter.addAll(tweets);
                     adapter.notifyDataSetChanged();
@@ -281,6 +312,21 @@ public class TimelineActivity extends AppCompatActivity {
 
                     //Progress bar
                     pb.setVisibility(ProgressBar.INVISIBLE);
+
+                    //Query for existing tweets in DB;
+                    // run on background thread
+                    AsyncTask.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.i(TAG, "Saving data into DB");
+                            //Insert users first for foreign key
+                            List<User> usersFromNetwork = User.fromJsonTweetArray(tweetsFromNetwork);
+                            tweetDao.insertModel(usersFromNetwork.toArray(new User[0]));
+                            //Insert tweets last
+                            tweetDao.insertModel(tweetsFromNetwork.toArray(new Tweet[0]));
+
+                        }
+                    });
                 } catch (JSONException e) {
                     Log.e(TAG, "Json exception: " + e);
                 }
@@ -291,7 +337,7 @@ public class TimelineActivity extends AppCompatActivity {
             public void onFailure(int statusCode, Headers headers,
                                   String response, Throwable throwable) {
                 Log.e(TAG, "onFailure: " + response , throwable);
-                Toast.makeText(TimelineActivity.this, "Rate limit reached! Please wait 15 minutes.", Toast.LENGTH_LONG).show();
+                //Toast.makeText(TimelineActivity.this, "Rate limit reached! Please wait 15 minutes.", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -323,4 +369,9 @@ Trying to use Glide while processing the image causes the RecView to misassign
     the image to the wrong item; what exactly causes this? MAKE SURE TO DO
     URL WORK BEFORE ASSIGNING URL TO GLIDE
 For viewbinding, MAKE SURE TO REBUILD WHEN CHANGES ARE MADE (see error)
+
+Notes on Persistence
+ORM - Object Relation Mapper
+    Ex. Room; helps get data from SQLite by mapping
+    data to Java Objects
  */

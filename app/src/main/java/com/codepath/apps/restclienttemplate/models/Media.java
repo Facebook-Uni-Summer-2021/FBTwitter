@@ -2,6 +2,9 @@ package com.codepath.apps.restclienttemplate.models;
 
 import android.util.Log;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,11 +15,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Parcel
+//@Entity
 public class Media {
     private static final String TAG = "Media";
 
+    //@ColumnInfo
     public String displayUrl;
+
+    //@ColumnInfo
     public String expandedUrl;
+
+    //@ColumnInfo
     public String mediaUrl;
 
     //Required by Parceler
