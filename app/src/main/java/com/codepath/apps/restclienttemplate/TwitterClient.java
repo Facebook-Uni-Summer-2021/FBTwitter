@@ -23,6 +23,7 @@ import okhttp3.Headers;
  * NOTE: You may want to rename this object based on the service i.e TwitterClient or FlickrClient
  * 
  */
+
 public class TwitterClient extends OAuthBaseClient {
 	//public static final BaseApi REST_API_INSTANCE = FlickrApi.instance(FlickrApi.FlickrPerm.WRITE); // Change this
 	public static final BaseApi REST_API_INSTANCE = TwitterApi.instance();

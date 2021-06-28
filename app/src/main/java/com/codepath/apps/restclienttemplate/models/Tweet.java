@@ -32,7 +32,7 @@ import okhttp3.Headers;
  */
 //Required by Parceler
 @Parcel
-@androidx.room.Entity(foreignKeys = @ForeignKey(entity=User.class, parentColumns="id", childColumns="userId"))
+@androidx.room.Entity(foreignKeys = @ForeignKey(entity = User.class, parentColumns = "id", childColumns = "userId"))
 public class Tweet {
     private static final String TAG = "Tweet";
 
@@ -63,8 +63,15 @@ public class Tweet {
 
     //Perhaps create a variable for the single media url?
 
+    //Remove @Ignore later
+    @Ignore
+    public boolean hasRetweet;
+
     @Ignore
     public User user;
+
+    @Ignore
+    public Tweet retweet;
 
 //    @Ignore
 //    public Entity entity;
@@ -73,11 +80,13 @@ public class Tweet {
     public String mediaUrl;
 
     //Required by Parceler
-    public Tweet () {}
+    public Tweet() {
+    }
 
     /**
      * Create a tweet as per the json fields/attributes (refer
      * to the JSON in the API docs for the attribute names).
+     *
      * @param jsonObject A JSON Object representing a tweet.
      * @return A tweet model.
      */
@@ -89,19 +98,26 @@ public class Tweet {
         // tweets because the IDs were different, we checked if a tweet was retweeted;
         // if the tweet was, we got the original tweet's information to accurately
         // like/unlike and retweet/unretweet it
-        if(jsonObject.has("retweeted_status")) {
+        if (jsonObject.has("retweeted_status")) {
+            Log.i(TAG, "Retweet found");
             JSONObject retweetedStatus = jsonObject.getJSONObject("retweeted_status");
-            tweet.tweetId = retweetedStatus.getLong("id");
-            tweet.likeCount = retweetedStatus.getLong("favorite_count");
-            tweet.isFavorited = retweetedStatus.getBoolean("favorited");
+            tweet.retweet = fromJson(retweetedStatus);
+            tweet.hasRetweet = true;
+//            tweet.tweetId = retweetedStatus.getLong("id");
+//            tweet.likeCount = retweetedStatus.getLong("favorite_count");
+//            tweet.isFavorited = retweetedStatus.getBoolean("favorited");
+//            tweet.retweetCount = retweetedStatus.getLong("retweet_count");
+//            tweet.isRetweeted = retweetedStatus.getBoolean("retweeted");
+//            Log.e(TAG, "Retweet: ID: " + tweet.tweetId + ", Favorite: " + tweet.isFavorited);
         } else {
             tweet.tweetId = jsonObject.getLong("id");
             tweet.likeCount = jsonObject.getLong("favorite_count");
             tweet.isFavorited = jsonObject.getBoolean("favorited");
+            tweet.retweetCount = jsonObject.getLong("retweet_count");
+            tweet.isRetweeted = jsonObject.getBoolean("retweeted");
+            tweet.hasRetweet = false;
+            //Log.e(TAG, "Normal: ID: " + tweet.tweetId + ", Favorite: " + tweet.isFavorited);
         }
-
-        tweet.retweetCount = jsonObject.getLong("retweet_count");
-        tweet.isRetweeted = jsonObject.getBoolean("retweeted");
 
         //The body, or text, of the tweet
         tweet.body = jsonObject.getString("text");
@@ -132,17 +148,17 @@ public class Tweet {
             tweet.mediaUrl = "";
 //        Log.i(TAG, "here: " + test1.toString());
 //        Log.e(TAG, "REEE" + tweet.entity.medias.get(0).mediaUrl);
-
         return tweet;
     }
 
     /**
      * Creates a list of tweet objects from a JSON array (call
      * this when obtaining JSON array directly from API/source).
+     *
      * @param jsonArray A JSON array of tweets.
      * @return A list of tweets converted to its model.
      */
-    public static List<Tweet> fromJsonArray (JSONArray jsonArray)
+    public static List<Tweet> fromJsonArray(JSONArray jsonArray)
             throws JSONException {
         List<Tweet> tweets = new LinkedList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
@@ -154,7 +170,7 @@ public class Tweet {
 
     //Implementation of the ParseRelativeData.java from the following
     //https://gist.github.com/nesquena/f786232f5ef72f6e10a7
-    public static String getRelativeTimeAgo (String time) {
+    public static String getRelativeTimeAgo(String time) {
         String twitterFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
         SimpleDateFormat sf =
                 new SimpleDateFormat(twitterFormat, Locale.ENGLISH);
@@ -176,19 +192,25 @@ public class Tweet {
 
     /**
      * Updates the like status of a tweet both locally and in the API.
+     *
      * @param client The TwitterClient.
      */
-    public void unlike(TwitterClient client) {
+    public void unlike(final TwitterClient client) {
         //This is done so the timeline is accurately depicted
-        if (likeCount > 0) {
-            likeCount--;
+        //I included the retweet if available to like the correct tweet
+        if (hasRetweet) {
+            if (retweet.likeCount > 0)
+                retweet.likeCount--;
         }
+
+        if (likeCount > 0)
+            likeCount--;
+
         isFavorited = false;
         client.unlikeTweet(tweetId, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
                 Log.i(TAG, "unlike tweet");
-
             }
 
             @Override
@@ -196,20 +218,39 @@ public class Tweet {
                 Log.e(TAG, "onUnlikeFailure: " + response, throwable);
             }
         });
+
+        if (hasRetweet) {
+            client.unlikeTweet(retweet.tweetId, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Headers headers, JSON json) {
+                    Log.i(TAG, "unlike retweet");
+                }
+
+                @Override
+                public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                    Log.e(TAG, "onUnlikeFailure retweet: " + response, throwable);
+                }
+            });
+        }
     }
 
     /**
      * Updates the like status of a tweet both locally and in the API.
+     *
      * @param client The TwitterClient.
      */
-    public void like(TwitterClient client) {
+    public void like(final TwitterClient client) {
+        //likeCount++;
+        if (hasRetweet)
+            retweet.likeCount++;
+
         likeCount++;
+
         isFavorited = true;
         client.likeTweet(tweetId, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
                 Log.i(TAG, "like tweet");
-
             }
 
             @Override
@@ -217,21 +258,53 @@ public class Tweet {
                 Log.e(TAG, "onLikeFailure: " + response, throwable);
             }
         });
+
+        if (hasRetweet) {
+            client.likeTweet(retweet.tweetId, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Headers headers, JSON json) {
+                    Log.i(TAG, "like retweet");
+                }
+
+                @Override
+                public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                    Log.e(TAG, "onLikeFailure retweet: " + response, throwable);
+                }
+            });
+        }
     }
 
     /**
      * Updates the retweet status of a tweet both locally and in the API.
+     *
      * @param client The TwitterClient.
      */
-    public void unRetweet(TwitterClient client) {
-        if (retweetCount > 0) {
-            retweetCount--;
+    public void unRetweet(final TwitterClient client) {
+        if (hasRetweet) {
+            if (retweet.retweetCount > 0)
+                retweet.retweetCount--;
         }
+        if (retweetCount > 0)
+            retweetCount--;
+
         isRetweeted = false;
         client.unretweet(tweetId, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
                 Log.i(TAG, "unretweet tweet");
+                if (hasRetweet) {
+                    client.unretweet(retweet.tweetId, new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Headers headers, JSON json) {
+                            Log.i(TAG, "unretweet retweet");
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                            Log.e(TAG, "onUnretweetFailure retweet: " + response, throwable);
+                        }
+                    });
+                }
             }
 
             @Override
@@ -243,16 +316,33 @@ public class Tweet {
 
     /**
      * Updates the retweet status of a tweet both locally and in the API.
+     *
      * @param client The TwitterClient.
      */
-    public void retweet(TwitterClient client) {
-        retweetCount++;
-        isRetweeted = true;
+    public void retweet(final TwitterClient client) {
+        if (hasRetweet)
+            retweet.retweetCount++;
 
+        retweetCount++;
+
+        isRetweeted = true;
         client.retweet(tweetId, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
                 Log.i(TAG, "retweet tweet");
+                if (hasRetweet) {
+                    client.retweet(retweet.tweetId, new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Headers headers, JSON json) {
+                            Log.i(TAG, "retweet retweet");
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                            Log.e(TAG, "onRetweetFailure retweet: " + response, throwable);
+                        }
+                    });
+                }
             }
 
             @Override

@@ -6,12 +6,12 @@ apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
 
 android {
 
-    compileSdkVersion 28
+    compileSdkVersion 28//28
 
     defaultConfig {
         applicationId "com.codepath.apps.restclienttemplate"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 28//28
 
         // Room schemas; instructions for how schema evolves over time
         javaCompileOptions {

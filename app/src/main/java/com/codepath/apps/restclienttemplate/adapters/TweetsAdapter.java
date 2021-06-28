@@ -26,6 +26,7 @@ import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.TimelineActivity;
 import com.codepath.apps.restclienttemplate.TwitterApp;
 import com.codepath.apps.restclienttemplate.TwitterClient;
+import com.codepath.apps.restclienttemplate.databinding.ItemTweetBinding;
 import com.codepath.apps.restclienttemplate.models.Media;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
@@ -131,6 +132,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            //ItemTweetBinding binding = ItemTweetBinding.inflate();
+
             //An activity does not exist for the adapter, or so it SEEMS
             tvScreenName = itemView.findViewById(R.id.tvScreenName);
             tvName = itemView.findViewById(R.id.tvName);
@@ -148,18 +151,29 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 
         public void bind(final Tweet tweet) {
             Log.e(TAG, "Msg: " + tweet.user.screenName);
+
+            //Handle retweet?
+
             tvScreenName.setText("@" + tweet.user.screenName);
             tvName.setText(tweet.user.name);
             tvTime.setText(Tweet.getRelativeTimeAgo(tweet.createdAt));
             tvBody.setText(tweet.body);
 
-            tvTweetLikeCount.setText(String.valueOf(tweet.likeCount));
-            tvTweetRetweetCount.setText(String.valueOf(tweet.retweetCount));
-
-            //Use Glide for images with URLs
-            Glide.with(context)
-                    .load(tweet.user.profileImageUrl)
-                    .into(ivProfileImage);
+            if (tweet.hasRetweet) {
+                tvTweetLikeCount.setText(String.valueOf(tweet.retweet.likeCount));
+                tvTweetRetweetCount.setText(String.valueOf(tweet.retweet.retweetCount));
+                //Use Glide for images with URLs
+                Glide.with(context)
+                        .load(tweet.retweet.user.profileImageUrl)
+                        .into(ivProfileImage);
+            } else {
+                tvTweetLikeCount.setText(String.valueOf(tweet.likeCount));
+                tvTweetRetweetCount.setText(String.valueOf(tweet.retweetCount));
+                //Use Glide for images with URLs
+                Glide.with(context)
+                        .load(tweet.user.profileImageUrl)
+                        .into(ivProfileImage);
+            }
 
             //List<Media> medias = tweet.entity.medias;
 //            Media media = tweet.entity.medias.get(0);
@@ -192,13 +206,13 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 //                Log.i(TAG, "No medias available");
 //            }
 
-            ivProfileImage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.i(TAG, "onClickAvatar");
-                    //Create detailed activity to view followers and following
-                }
-            });
+//            ivProfileImage.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Log.i(TAG, "onClickAvatar");
+//                    //Create detailed activity to view followers and following
+//                }
+//            });
 
             tvBody.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -211,45 +225,85 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                 }
             });
 
-            if (tweet.isFavorited) {
-                ivTweetLike.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_heart));
-            } else {
-                ivTweetLike.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_heart_stroke));
-            }
+            if (tweet.hasRetweet) {
+                //Deal with retweet
+                if (tweet.retweet.isFavorited) {
+                    ivTweetLike.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_heart));
+                } else {
+                    ivTweetLike.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_heart_stroke));
+                }
 
-            if (tweet.isRetweeted) {
-                ivTweetRetweet.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_retweet));
+                if (tweet.retweet.isRetweeted) {
+                    ivTweetRetweet.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_retweet));
+                } else {
+                    ivTweetRetweet.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_retweet_stroke));
+                }
             } else {
-                ivTweetRetweet.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_retweet_stroke));
+                //Deal with normal tweet
+                if (tweet.isFavorited) {
+                    ivTweetLike.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_heart));
+                } else {
+                    ivTweetLike.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_heart_stroke));
+                }
+
+                if (tweet.isRetweeted) {
+                    ivTweetRetweet.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_retweet));
+                } else {
+                    ivTweetRetweet.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_retweet_stroke));
+                }
             }
 
             ivTweetLike.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (tweet.isFavorited) {
-                        tweet.unlike(client);
-                        ivTweetLike.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_heart_stroke));
-                    } else {
-                        tweet.like(client);
-                        ivTweetLike.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_heart));
+                    if (tweet.hasRetweet) {
+                        if (tweet.retweet.isFavorited) {
+                            tweet.retweet.unlike(client);
+                            ivTweetLike.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_heart_stroke));
+                        } else {
+                            tweet.retweet.like(client);
+                            ivTweetLike.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_heart));
 
+                        }
+                        tvTweetLikeCount.setText(String.valueOf(tweet.retweet.likeCount));
+                    } else {
+                        if (tweet.isFavorited) {
+                            tweet.unlike(client);
+                            ivTweetLike.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_heart_stroke));
+                        } else {
+                            tweet.like(client);
+                            ivTweetLike.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_heart));
+
+                        }
+                        tvTweetLikeCount.setText(String.valueOf(tweet.likeCount));
                     }
-                    tvTweetLikeCount.setText(String.valueOf(tweet.likeCount));
                 }
             });
 
             ivTweetRetweet.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (tweet.isRetweeted) {
-                        tweet.unRetweet(client);
-                        ivTweetRetweet.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_retweet_stroke));
+                    if (tweet.hasRetweet) {
+                        if (tweet.retweet.isRetweeted) {
+                            tweet.retweet.unRetweet(client);
+                            ivTweetRetweet.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_retweet_stroke));
 
+                        } else {
+                            tweet.retweet.retweet(client);
+                            ivTweetRetweet.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_retweet));
+                        }
+                        tvTweetRetweetCount.setText(String.valueOf(tweet.retweet.retweetCount));
                     } else {
-                        tweet.retweet(client);
-                        ivTweetRetweet.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_retweet));
+                        if (tweet.isRetweeted) {
+                            tweet.unRetweet(client);
+                            ivTweetRetweet.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_retweet_stroke));
+
+                        } else {
+                            tweet.retweet(client);
+                            ivTweetRetweet.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_vector_retweet));
+                        }
+                        tvTweetRetweetCount.setText(String.valueOf(tweet.retweetCount));
                     }
-                    tvTweetRetweetCount.setText(String.valueOf(tweet.retweetCount));
                 }
             });
 
