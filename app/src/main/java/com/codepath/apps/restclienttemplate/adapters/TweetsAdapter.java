@@ -166,6 +166,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                 Glide.with(context)
                         .load(tweet.retweet.user.profileImageUrl)
                         .into(ivProfileImage);
+                //Think about adding media here?
             } else {
                 tvTweetLikeCount.setText(String.valueOf(tweet.likeCount));
                 tvTweetRetweetCount.setText(String.valueOf(tweet.retweetCount));

@@ -87,29 +87,56 @@ public class DetailTweetActivity extends AppCompatActivity {
         binding.tvName.setText("@" + tweet.user.name);
         binding.tvTime.setText(Tweet.getRelativeTimeAgo(tweet.createdAt));
         binding.tvBody.setText(tweet.body);
-        binding.tvLikeCount.setText(String.valueOf(tweet.likeCount));
-        binding.tvRetweetCount.setText(String.valueOf(tweet.retweetCount));
 
-        //Defines like and retweet image based on if it has been liked or retweeted
-        if (tweet.isFavorited) {
-            binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart));
+
+        if (tweet.hasRetweet) {
+            binding.tvLikeCount.setText(String.valueOf(tweet.retweet.likeCount));
+            binding.tvRetweetCount.setText(String.valueOf(tweet.retweet.retweetCount));
+            //Use Glide for images with URLs
+            Glide.with(this)
+                    .load(tweet.retweet.user.profileImageUrl)
+                    .into(binding.ivProfileImage);
+            //Think about adding media here?
         } else {
-            binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart_stroke));
+            binding.tvLikeCount.setText(String.valueOf(tweet.likeCount));
+            binding.tvRetweetCount.setText(String.valueOf(tweet.retweetCount));
+            //Use Glide for images with URLs
+            Glide.with(this)
+                    .load(tweet.user.profileImageUrl)
+                    .into(binding.ivProfileImage);
         }
 
-        if (tweet.isRetweeted) {
-            binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet));
-        } else {
-            binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet_stroke));
-        }
-
-        //Use Glide for images with URLs
-        Glide.with(this)
-                .load(tweet.user.profileImageUrl)
-                .into(binding.ivProfileImage);
         //List<Media> medias = tweet.entity.medias;
 //        Glide.with(this).load(medias.get(0).mediaUrl).into(binding.ivMedia);
         Glide.with(this).load(tweet.mediaUrl).into(binding.ivMedia);
+
+
+        //Defines like and retweet image based on if it has been liked or retweeted
+        if (tweet.hasRetweet) {
+            if (tweet.retweet.isFavorited) {
+                binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart));
+            } else {
+                binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart_stroke));
+            }
+
+            if (tweet.retweet.isRetweeted) {
+                binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet));
+            } else {
+                binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet_stroke));
+            }
+        } else {
+            if (tweet.isFavorited) {
+                binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart));
+            } else {
+                binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart_stroke));
+            }
+
+            if (tweet.isRetweeted) {
+                binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet));
+            } else {
+                binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet_stroke));
+            }
+        }
 
         //To deal with possible disconnect and to make it nicer, manually
         // change the values of the likeCount and ivLike to accurately display changes
@@ -119,16 +146,29 @@ public class DetailTweetActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Log.i(TAG, "onClick Like");
 
-                if (tweet.isFavorited) {
-                    //All work placed in Tweet model so work stays consistent
-                    tweet.unlike(client);
-                    binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart_stroke));
+                if (tweet.hasRetweet) {
+                    if (tweet.retweet.isFavorited) {
+                        //All work placed in Tweet model so work stays consistent
+                        tweet.retweet.unlike(client);
+                        binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart_stroke));
+                    } else {
+                        tweet.retweet.like(client);
+                        binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart));
+                    }
+                    //Make sure to set count!!!!!
+                    binding.tvLikeCount.setText(String.valueOf(tweet.retweet.likeCount));
                 } else {
-                    tweet.like(client);
-                    binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart));
+                    if (tweet.isFavorited) {
+                        //All work placed in Tweet model so work stays consistent
+                        tweet.unlike(client);
+                        binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart_stroke));
+                    } else {
+                        tweet.like(client);
+                        binding.ivLike.setImageDrawable(getDrawable(R.drawable.ic_vector_heart));
+                    }
+                    //Make sure to set count!!!!!
+                    binding.tvLikeCount.setText(String.valueOf(tweet.likeCount));
                 }
-                //Make sure to set count!!!!!
-                binding.tvLikeCount.setText(String.valueOf(tweet.likeCount));
             }
         });
 
@@ -137,14 +177,26 @@ public class DetailTweetActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.i(TAG, "OnClick Retweet");
-                if (tweet.isRetweeted) {
-                    tweet.unRetweet(client);
-                    binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet_stroke));
+
+                if (tweet.hasRetweet) {
+                    if (tweet.retweet.isRetweeted) {
+                        tweet.retweet.unRetweet(client);
+                        binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet_stroke));
+                    } else {
+                        tweet.retweet.retweet(client);
+                        binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet));
+                    }
+                    binding.tvRetweetCount.setText(String.valueOf(tweet.retweet.retweetCount));
                 } else {
-                    tweet.retweet(client);
-                    binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet));
+                    if (tweet.isRetweeted) {
+                        tweet.unRetweet(client);
+                        binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet_stroke));
+                    } else {
+                        tweet.retweet(client);
+                        binding.ivRetweet.setImageDrawable(getDrawable(R.drawable.ic_vector_retweet));
+                    }
+                    binding.tvRetweetCount.setText(String.valueOf(tweet.retweetCount));
                 }
-                binding.tvRetweetCount.setText(String.valueOf(tweet.retweetCount));
             }
         });
 
